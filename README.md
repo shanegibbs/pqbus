@@ -1,5 +1,5 @@
 # Pqbus
-A simple event driven highly available message queue backed with PostgreSQL.
+A simple event driven highly available message queue backed with PostgreSQL and focused on stability performance.
 
 Initialize database
 
