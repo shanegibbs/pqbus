@@ -132,14 +132,19 @@ fn consume<F>(conn: &Connection, work_fn: F)
 }
 
 fn main() {
-    let conn = Connection::connect("postgres://postgres@localhost:32768/pqbus", SslMode::None)
-        .unwrap();
-
     let mut args = env::args();
     args.next(); // skip first
-    let cmd = args.next().unwrap_or("".to_string());
 
-    println!("cmd={}", cmd);
+    let cmd = args.next().unwrap_or("".to_string());
+    let db_uri = args.next().unwrap_or("".to_string());
+
+    let conn = match Connection::connect(db_uri.as_ref(), SslMode::None) {
+        Err(e) => {
+            println!("Failed to connect to database: {}", e);
+            std::process::exit(1);
+        }
+        Ok(c) => c,
+    };
 
     if cmd == "init" {
         init(&conn);
