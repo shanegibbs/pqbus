@@ -1,0 +1,7 @@
+[package]
+name = "pqbus"
+version = "0.1.0"
+authors = ["Shane Gibbs <shane@hands.net.nz>"]
+
+[dependencies]
+postgres = "0.11"
