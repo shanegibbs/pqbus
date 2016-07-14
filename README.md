@@ -2,6 +2,7 @@
 A simple event driven highly available message queue backed with PostgreSQL, focused on stability and performance.
 
 [![Build Status](https://travis-ci.org/shanegibbs/pqbus.svg?branch=master)](https://travis-ci.org/shanegibbs/pqbus)
+[![Dependency Status](https://dependencyci.com/github/shanegibbs/pqbus/badge)](https://dependencyci.com/github/shanegibbs/pqbus)
 
 Push a message
 
