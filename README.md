@@ -8,7 +8,7 @@ Push a message
 
 ```rust
 let bus = pqbus::new("postgres://postgres@localhost/pqbus", "test").unwrap();
-let queue = bus.create_push("myqueue").unwrap();
+let queue = bus.queue("myqueue").unwrap();
 queue.push("Hello World!");
 ```
 
@@ -16,7 +16,7 @@ Pop messages
 
 ```rust
 let bus = pqbus::new("postgres://postgres@localhost/pqbus", "test").unwrap();
-let queue = bus.create_pop("checker").unwrap();
+let queue = bus.queue("checker").unwrap();
 queue.pop_callback(|body| {
     println!("Received: {}", body);
 });
