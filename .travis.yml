@@ -3,6 +3,22 @@ rust:
   - stable
   - beta
   - nightly
+before_install:
+  - sudo /etc/init.d/postgresql stop
+  - sudo apt-get update
+  - sudo apt-get install net-tools postgresql-9.5
+  - sudo sed -i 's/md5/trust/g' /etc/postgresql/9.5/main/pg_hba.conf
+  - sudo sed -i 's/5433/5432/g' /etc/postgresql/9.5/main/postgresql.conf
+  - sudo /etc/init.d/postgresql reload 9.5
+  - sudo /etc/init.d/postgresql start 9.5
+  - sleep 10
+  - sudo /etc/init.d/postgresql restart 9.5
+  - sleep 10
+before_script:
+  - ps axuf
+  - netstat -anp
+  - cat /etc/postgresql/9.5/main/postgresql.conf
+  - psql postgres://postgres@localhost/postgres -c 'create database pqbus_test'
 matrix:
   allow_failures:
     - rust: nightly

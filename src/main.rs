@@ -7,7 +7,6 @@ fn run(db_uri: &String, cmd: &String) -> Result<i32, pqbus::error::Error> {
     let bus = try!(pqbus::new(db_uri.as_ref(), "test"));
 
     match cmd.as_ref() {
-
         "push" => {
             // read stdin
             let mut buffer = String::new();
@@ -20,33 +19,30 @@ fn run(db_uri: &String, cmd: &String) -> Result<i32, pqbus::error::Error> {
             }
 
             // push message
-            let queue = try!(bus.create_push("checker"));
-            try!(queue.push(&buffer));
+            let queue = try!(bus.queue("checker"));
+            try!(queue.push(buffer));
             println!("Message sent");
         }
 
         "pop" => {
             // pop message
-            let queue = try!(bus.create_pop("checker"));
+            let queue = try!(bus.queue("checker"));
             let body = try!(queue.pop());
             println!("Received: {}", body);
-
         }
 
         "popall" => {
             // pop message callback
-            let queue = try!(bus.create_pop("checker"));
+            let queue = try!(bus.queue("checker"));
             try!(queue.pop_callback(|body| {
                 println!("Got: {}", body);
             }));
-
         }
 
         _ => {
             println!("Unknown command: {}", cmd);
             return Ok(1);
         }
-
     }
     Ok(0)
 }

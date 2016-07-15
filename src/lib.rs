@@ -16,66 +16,46 @@ pub struct PqBus {
     conn: Connection,
 }
 
-pub struct QueuePush<'a> {
-    push_stmt: Statement<'a>,
-    notify_stmt: Statement<'a>,
-}
-
-pub struct QueuePop<'a> {
+pub struct Queue<'a> {
     notifications: Notifications<'a>,
     pop_stmt: Statement<'a>,
+    push_stmt: Statement<'a>,
+    notify_stmt: Statement<'a>,
+    size_stmt: Statement<'a>,
 }
 
-pub fn new(db_uri: &str, name: &str) -> Result<PqBus> {
+pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus> where S: Into<String>, T: Into<String> {
     Ok(PqBus {
-        conn: try!(Connection::connect(db_uri, SslMode::None)),
-        name: name.to_string(),
+        conn: try!(Connection::connect(db_uri.into().as_ref(), SslMode::None)),
+        name: name.into(),
     })
 }
 
 impl PqBus {
-    fn table_name(&self, queue_name: &str) -> String {
-        format!("{}_{}_queue", self.name, queue_name)
+    fn table_name<S>(&self, queue_name: S) -> String where S: Into<String> {
+        format!("pqbus_{}_{}_queue", self.name, queue_name.into())
     }
 
-    pub fn create_push<'a>(&'a self, name: &str) -> Result<QueuePush<'a>> {
+    pub fn queue<'a>(&'a self, name: &str) -> Result<Queue<'a>> {
         let table_name = self.table_name(name);
         try!(self.conn.execute(&format!(r#"
                 CREATE TABLE IF NOT EXISTS {} (
                     id SERIAL PRIMARY KEY,
                     body VARCHAR NOT NULL,
                     lock VARCHAR DEFAULT NULL
-                )"#,
-                                        table_name),
-                               &[]));
-        Ok(QueuePush {
-            push_stmt: try!(self.conn
-                .prepare_cached(&format!("INSERT INTO {} (body) VALUES ($1)", table_name))),
-            notify_stmt: try!(self.conn.prepare_cached(&format!("NOTIFY {}", table_name))),
-        })
-    }
-
-    pub fn create_pop<'a>(&'a self, name: &str) -> Result<QueuePop<'a>> {
-        QueuePop::new(&self.conn, &self.table_name(name))
-    }
-
-    // fn size() ?
-}
-
-impl<'a> QueuePush<'a> {
-    pub fn push(&self, body: &String) -> Result<bool> {
-        // TODO use bytes for body. generics for conversion?
-        try!(self.push_stmt.execute(&[body]));
-        try!(self.notify_stmt.execute(&[]));
-        Ok(true)
+                )"#, table_name), &[]));
+        Queue::new(&self.conn, &self.table_name(name))
     }
 }
 
-impl<'a> QueuePop<'a> {
+impl<'a> Queue<'a> {
     fn new(conn: &'a Connection, table_name: &String) -> Result<Self> {
         try!(conn.execute(&format!("LISTEN {}", table_name), &[]));
-        Ok(QueuePop {
+        Ok(Queue {
             notifications: conn.notifications(),
+            push_stmt: try!(conn.prepare_cached(&format!("INSERT INTO {} (body) VALUES ($1)", table_name))),
+            notify_stmt: try!(conn.prepare_cached(&format!("NOTIFY {}", table_name))),
+            size_stmt: try!(conn.prepare_cached(&format!("SELECT count(*) FROM  {}", table_name))),
             pop_stmt: try!(conn.prepare_cached(&format!(r#"
                         UPDATE {n} q
                         SET lock = 'me'
@@ -88,9 +68,25 @@ impl<'a> QueuePop<'a> {
                            ) sub
                         WHERE q.id = sub.id
                         RETURNING q.id, q.body;
-                        "#,
-                                                        n = table_name))),
+                        "#, n = table_name))),
         })
+    }
+
+    pub fn size(&self) -> Result<i64> {
+        let result = try!(self.size_stmt.query(&[]));
+        let row = result.get(0);
+        Ok(row.get("count"))
+    }
+
+    pub fn is_empty(&self) -> Result<bool> {
+        Ok(try!(self.size()) == 0)
+    }
+
+    pub fn push<S>(&self, body: S) -> Result<bool> where S: Into<String> {
+        // TODO use bytes for body. generics for conversion?
+        try!(self.push_stmt.execute(&[&body.into()]));
+        try!(self.notify_stmt.execute(&[]));
+        Ok(true)
     }
 
     pub fn pop(&self) -> Result<String> {
@@ -108,7 +104,7 @@ impl<'a> QueuePop<'a> {
     {
         loop {
             self.consume_pending_notifications();
-            self.consume_pending_items(&work_fn);
+            try!(self.consume_pending_items(&work_fn));
             self.wait_for_next_notification();
         }
     }
