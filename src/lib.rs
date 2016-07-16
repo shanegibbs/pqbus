@@ -1,9 +1,13 @@
 extern crate postgres;
+extern crate retry;
 
 use postgres::{Connection, SslMode};
 use postgres::notification::Notifications;
 use postgres::stmt::Statement;
+use retry::retry;
 use std::result;
+use std::time::Duration;
+// use std::error::Error as StdError;
 
 use error::Error;
 
@@ -28,8 +32,26 @@ pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus>
     where S: Into<String>,
           T: Into<String>
 {
+    let uri = db_uri.into();
+
+    let conn = match retry(10,
+                           100,
+                           || Connection::connect(uri.as_ref(), SslMode::None),
+                           |r| {
+                               if let &Err(ref e) = r {
+                                   println!("Failed to connect to postgresql server: {}", e);
+                               }
+                               r.is_ok()
+                           }) {
+        Err(e) => {
+            println!("Giving up on postgresql server connection: {}", e);
+            return Err(Error::Connection(uri, e));
+        }
+        Ok(c) => c.unwrap(),
+    };
+
     Ok(PqBus {
-        conn: try!(Connection::connect(db_uri.into().as_ref(), SslMode::None)),
+        conn: conn,
         name: name.into(),
     })
 }
@@ -43,14 +65,16 @@ impl PqBus {
 
     pub fn queue<'a>(&'a self, name: &str) -> Result<Queue<'a>> {
         let table_name = self.table_name(name);
-        try!(self.conn.execute(&format!(r#"
+        try!(self.conn
+            .execute(&format!(r#"
                 CREATE TABLE IF NOT EXISTS {} (
                     id SERIAL PRIMARY KEY,
                     body VARCHAR NOT NULL,
                     lock VARCHAR DEFAULT NULL
                 )"#,
-                                        table_name),
-                               &[]));
+                              table_name),
+                     &[])
+            .map_err(|e| Error::Create(e)));
         Queue::new(&self.conn, &self.table_name(name))
     }
 }
@@ -110,6 +134,23 @@ impl<'a> Queue<'a> {
         }
     }
 
+    pub fn pop_wait(&self, timeout: Duration) -> Result<Option<String>> {
+        {
+            let p = try!(self.attempt_pop());
+            if p.is_some() {
+                return Ok(p);
+            }
+        }
+        self.notifications.timeout_iter(timeout).next();
+        {
+            let p = try!(self.attempt_pop());
+            if p.is_some() {
+                return Ok(p);
+            }
+        }
+        Ok(None)
+    }
+
     pub fn pop_callback<F>(&self, work_fn: F) -> Result<bool>
         where F: Fn(String)
     {
@@ -127,7 +168,7 @@ impl<'a> Queue<'a> {
         }
 
         let locked_row = locked.get(0);
-        let id: i32 = match locked_row.get_opt("id") {
+        let _id: i32 = match locked_row.get_opt("id") {
             None => {
                 println!("No lock obtained");
                 return Ok(None);
@@ -138,7 +179,6 @@ impl<'a> Queue<'a> {
             }
             Some(Ok(r)) => r,
         };
-        println!("Got work id {}", id);
 
         let body: String = match locked_row.get_opt("body") {
             None => {

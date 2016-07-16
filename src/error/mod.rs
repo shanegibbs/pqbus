@@ -1,5 +1,6 @@
-use postgres::error::ConnectError;
+// use postgres::error::ConnectError;
 use postgres::error::Error as PostgresError;
+use retry::RetryError;
 
 // An error encountered in pqbus
 #[derive(Debug)]
@@ -8,15 +9,10 @@ pub enum Error {
     Pop(PostgresError),
     Notify(PostgresError),
     Listen(PostgresError),
+    Create(PostgresError),
     Size(PostgresError),
-    Connection(ConnectError),
+    Connection(String, RetryError),
     Sql(PostgresError),
-}
-
-impl From<ConnectError> for Error {
-    fn from(err: ConnectError) -> Error {
-        Error::Connection(err)
-    }
 }
 
 impl From<PostgresError> for Error {
