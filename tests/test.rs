@@ -8,15 +8,34 @@ fn db_uri() -> String {
     env::var("TEST_DB_URI").unwrap_or("postgres://postgres@localhost/pqbus_test".to_string())
 }
 
+fn conn() -> Connection {
+    match Connection::connect(db_uri().as_ref(), SslMode::None) {
+        Err(e) => {
+            println!("Failed to connect: {}", e);
+            panic!(e);
+        }
+        Ok(c) => c,
+    }
+}
+
 fn drop_table(name: &str) {
-    let conn = Connection::connect(db_uri().as_ref(), SslMode::None).unwrap();
-    conn.execute(&format!("drop table if exists {} cascade", name), &[]).unwrap();
+    conn().execute(&format!("drop table if exists {} cascade", name), &[]).unwrap();
 }
 
 #[test]
 fn test_connect_fail() {
     let bus = pqbus::new("bla", "work");
     assert!(bus.is_err());
+}
+
+#[test]
+fn test_push() {
+    drop_table("pqbus_push_a");
+    let bus = pqbus::new(db_uri(), "push").unwrap();
+    let queue = bus.queue("a").unwrap();
+
+    queue.push("a").unwrap();
+
 }
 
 #[test]
@@ -58,4 +77,46 @@ fn test_sequential_push_pop() {
     queue.push("Hello World!").unwrap();
     let result = queue.pop().unwrap();
     assert_eq!("Hello World!".to_string(), result)
+}
+
+#[test]
+fn test_one_bus_duel_queue_push_pop_in_order() {
+    drop_table("pqbus_test_sequential_push_pop_test_queue_a_queue");
+    drop_table("pqbus_test_sequential_push_pop_test_queue_b_queue");
+
+    let bus = pqbus::new(db_uri(), "test_sequential_push_pop").unwrap();
+    let queue_a = bus.queue("test_queue_a").unwrap();
+    let queue_b = bus.queue("test_queue_b").unwrap();
+    assert!(queue_a.is_empty().unwrap());
+    assert!(queue_b.is_empty().unwrap());
+
+    queue_a.push("a").unwrap();
+    queue_b.push("b").unwrap();
+
+    let result_a = queue_a.pop().unwrap();
+    let result_b = queue_b.pop().unwrap();
+
+    assert_eq!("a".to_string(), result_a);
+    assert_eq!("b".to_string(), result_b);
+}
+
+#[test]
+fn test_one_bus_duel_queue_push_pop_unorder() {
+    drop_table("pqbus_one_bus_duel_queue_push_pop_unorder_test_queue_a_queue");
+    drop_table("pqbus_one_bus_duel_queue_push_pop_unorder_test_queue_b_queue");
+
+    let bus = pqbus::new(db_uri(), "one_bus_duel_queue_push_pop_unorder").unwrap();
+    let queue_a = bus.queue("test_queue_a").unwrap();
+    let queue_b = bus.queue("test_queue_b").unwrap();
+    assert!(queue_a.is_empty().unwrap());
+    assert!(queue_b.is_empty().unwrap());
+
+    queue_a.push("a").unwrap();
+    queue_b.push("b").unwrap();
+
+    let result_b = queue_b.pop().unwrap();
+    let result_a = queue_a.pop().unwrap();
+
+    assert_eq!("a".to_string(), result_a);
+    assert_eq!("b".to_string(), result_b);
 }

@@ -19,6 +19,8 @@ before_script:
   - netstat -anp
   - cat /etc/postgresql/9.5/main/postgresql.conf
   - psql postgres://postgres@localhost/postgres -c 'create database pqbus_test'
+env:
+  - RUST_TEST_THREADS=4
 matrix:
   allow_failures:
     - rust: nightly

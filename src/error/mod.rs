@@ -4,6 +4,11 @@ use postgres::error::Error as PostgresError;
 // An error encountered in pqbus
 #[derive(Debug)]
 pub enum Error {
+    Push(PostgresError),
+    Pop(PostgresError),
+    Notify(PostgresError),
+    Listen(PostgresError),
+    Size(PostgresError),
     Connection(ConnectError),
     Sql(PostgresError),
 }

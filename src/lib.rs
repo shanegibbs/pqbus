@@ -24,7 +24,10 @@ pub struct Queue<'a> {
     size_stmt: Statement<'a>,
 }
 
-pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus> where S: Into<String>, T: Into<String> {
+pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus>
+    where S: Into<String>,
+          T: Into<String>
+{
     Ok(PqBus {
         conn: try!(Connection::connect(db_uri.into().as_ref(), SslMode::None)),
         name: name.into(),
@@ -32,7 +35,9 @@ pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus> where S: Into<String>, T: 
 }
 
 impl PqBus {
-    fn table_name<S>(&self, queue_name: S) -> String where S: Into<String> {
+    fn table_name<S>(&self, queue_name: S) -> String
+        where S: Into<String>
+    {
         format!("pqbus_{}_{}_queue", self.name, queue_name.into())
     }
 
@@ -43,17 +48,20 @@ impl PqBus {
                     id SERIAL PRIMARY KEY,
                     body VARCHAR NOT NULL,
                     lock VARCHAR DEFAULT NULL
-                )"#, table_name), &[]));
+                )"#,
+                                        table_name),
+                               &[]));
         Queue::new(&self.conn, &self.table_name(name))
     }
 }
 
 impl<'a> Queue<'a> {
     fn new(conn: &'a Connection, table_name: &String) -> Result<Self> {
-        try!(conn.execute(&format!("LISTEN {}", table_name), &[]));
+        try!(conn.execute(&format!("LISTEN {}", table_name), &[]).map_err(|e| Error::Listen(e)));
         Ok(Queue {
             notifications: conn.notifications(),
-            push_stmt: try!(conn.prepare_cached(&format!("INSERT INTO {} (body) VALUES ($1)", table_name))),
+            push_stmt:
+                try!(conn.prepare_cached(&format!("INSERT INTO {} (body) VALUES ($1)", table_name))),
             notify_stmt: try!(conn.prepare_cached(&format!("NOTIFY {}", table_name))),
             size_stmt: try!(conn.prepare_cached(&format!("SELECT count(*) FROM  {}", table_name))),
             pop_stmt: try!(conn.prepare_cached(&format!(r#"
@@ -68,12 +76,13 @@ impl<'a> Queue<'a> {
                            ) sub
                         WHERE q.id = sub.id
                         RETURNING q.id, q.body;
-                        "#, n = table_name))),
+                        "#,
+                                                        n = table_name))),
         })
     }
 
     pub fn size(&self) -> Result<i64> {
-        let result = try!(self.size_stmt.query(&[]));
+        let result = try!(self.size_stmt.query(&[]).map_err(|e| Error::Size(e)));
         let row = result.get(0);
         Ok(row.get("count"))
     }
@@ -82,10 +91,12 @@ impl<'a> Queue<'a> {
         Ok(try!(self.size()) == 0)
     }
 
-    pub fn push<S>(&self, body: S) -> Result<bool> where S: Into<String> {
+    pub fn push<S>(&self, body: S) -> Result<bool>
+        where S: Into<String>
+    {
         // TODO use bytes for body. generics for conversion?
-        try!(self.push_stmt.execute(&[&body.into()]));
-        try!(self.notify_stmt.execute(&[]));
+        try!(self.push_stmt.execute(&[&body.into()]).map_err(|e| Error::Push(e)));
+        try!(self.notify_stmt.execute(&[]).map_err(|e| Error::Notify(e)));
         Ok(true)
     }
 
@@ -110,7 +121,7 @@ impl<'a> Queue<'a> {
     }
 
     fn attempt_pop(&self) -> Result<Option<String>> {
-        let locked = try!(self.pop_stmt.query(&[]));
+        let locked = try!(self.pop_stmt.query(&[]).map_err(|e| Error::Pop(e)));
         if locked.is_empty() {
             return Ok(None);
         }
