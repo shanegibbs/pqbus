@@ -79,6 +79,7 @@ impl PqBus {
     }
 }
 
+/// A push pop message queue.
 impl<'a> Queue<'a> {
     fn new(conn: &'a Connection, table_name: &String) -> Result<Self> {
         try!(conn.execute(&format!("LISTEN {}", table_name), &[]).map_err(|e| Error::Listen(e)));
@@ -105,16 +106,19 @@ impl<'a> Queue<'a> {
         })
     }
 
+    /// Returns the number of messages in the queue.
     pub fn size(&self) -> Result<i64> {
         let result = try!(self.size_stmt.query(&[]).map_err(|e| Error::Size(e)));
         let row = result.get(0);
         Ok(row.get("count"))
     }
 
+    /// Determines if there are any pending messages.
     pub fn is_empty(&self) -> Result<bool> {
         Ok(try!(self.size()) == 0)
     }
 
+    /// Pushes a message into the queue.
     pub fn push<S>(&self, body: S) -> Result<bool>
         where S: Into<String>
     {
@@ -124,9 +128,10 @@ impl<'a> Queue<'a> {
         Ok(true)
     }
 
-    pub fn pop(&self) -> Result<String> {
+    /// Pops a message from the queue. Blocks if there are none pending.
+    pub fn pop_blocking(&self) -> Result<String> {
         loop {
-            let p = try!(self.attempt_pop());
+            let p = try!(self.pop());
             if p.is_some() {
                 return Ok(p.unwrap());
             }
@@ -134,16 +139,17 @@ impl<'a> Queue<'a> {
         }
     }
 
+    /// Pops a message from the queue. Blocks if there are none pending.
     pub fn pop_wait(&self, timeout: Duration) -> Result<Option<String>> {
         {
-            let p = try!(self.attempt_pop());
+            let p = try!(self.pop());
             if p.is_some() {
                 return Ok(p);
             }
         }
         self.notifications.timeout_iter(timeout).next();
         {
-            let p = try!(self.attempt_pop());
+            let p = try!(self.pop());
             if p.is_some() {
                 return Ok(p);
             }
@@ -151,6 +157,7 @@ impl<'a> Queue<'a> {
         Ok(None)
     }
 
+    /// Run a closure on messages in the queue. Blocks if there are none pending.
     pub fn pop_callback<F>(&self, work_fn: F) -> Result<bool>
         where F: Fn(String)
     {
@@ -161,7 +168,8 @@ impl<'a> Queue<'a> {
         }
     }
 
-    fn attempt_pop(&self) -> Result<Option<String>> {
+    /// Pops a message from the queue if there is one pending.
+    pub fn pop(&self) -> Result<Option<String>> {
         let locked = try!(self.pop_stmt.query(&[]).map_err(|e| Error::Pop(e)));
         if locked.is_empty() {
             return Ok(None);
@@ -205,7 +213,7 @@ impl<'a> Queue<'a> {
     {
         let mut i = 0;
         loop {
-            match try!(self.attempt_pop()) {
+            match try!(self.pop()) {
                 None => return Ok(i),
                 Some(body) => {
                     work_fn(body);
@@ -216,23 +224,66 @@ impl<'a> Queue<'a> {
     }
 
     fn wait_for_next_notification(&self) {
-        // self.notifications.timeout_iter(Duration::new(5, 0)).next();
         self.notifications.blocking_iter().next();
     }
 
-    pub fn messages(&self) -> MessageIter {
-        MessageIter { queue: self }
+    /// Returns an iterator over pending messages
+    pub fn messages(&'a self) -> MessageIter<'a, NextMessagePending> {
+        MessageIter::new(self, NextMessagePending {})
+    }
+
+    /// Returns an iterator over messages that blocks until a message is received if none are pending.
+    pub fn messages_blocking(&'a self) -> MessageIter<'a, NextMessageBlocking> {
+        MessageIter::new(self, NextMessageBlocking {})
     }
 }
 
-pub struct MessageIter<'a> {
+pub trait NextMessage {
+    fn next(&self, &Queue) -> Option<Result<String>>;
+}
+
+pub struct MessageIter<'a, N>
+    where N: NextMessage
+{
+    next_message: N,
     queue: &'a Queue<'a>,
 }
 
-impl<'a> Iterator for MessageIter<'a> {
+impl<'a, N> MessageIter<'a, N>
+    where N: NextMessage
+{
+    fn new(queue: &'a Queue<'a>, n: N) -> Self {
+        MessageIter {
+            next_message: n,
+            queue: queue,
+        }
+    }
+}
+
+impl<'a, N> Iterator for MessageIter<'a, N>
+    where N: NextMessage
+{
     type Item = Result<String>;
 
     fn next(&mut self) -> Option<Result<String>> {
-        Some(self.queue.pop())
+        self.next_message.next(self.queue)
+    }
+}
+
+pub struct NextMessageBlocking;
+impl NextMessage for NextMessageBlocking {
+    fn next(&self, q: &Queue) -> Option<Result<String>> {
+        Some(q.pop_blocking())
+    }
+}
+
+pub struct NextMessagePending;
+impl NextMessage for NextMessagePending {
+    fn next(&self, q: &Queue) -> Option<Result<String>> {
+        match q.pop() {
+            Ok(Some(m)) => Some(Ok(m)),
+            Ok(None) => None,
+            Err(e) => Some(Err(e)),
+        }
     }
 }
