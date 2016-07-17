@@ -1,3 +1,34 @@
+//! A simple event driven highly available message queue backed with PostgreSQL,
+//! focused on stability and performance.
+//!
+//! ## Producer
+//!
+//! ```rust,no_run
+//! extern crate pqbus;
+//!
+//! fn main() {
+//!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
+//!     let queue = bus.queue("new_users").unwrap();
+//!     queue.push("sgibbs");
+//! }
+//! ```
+//!
+//! ## Consumer
+//!
+//! ```rust,no_run
+//! extern crate pqbus;
+//!
+//! fn main() {
+//!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
+//!     let queue = bus.queue("new_users").unwrap();
+//!     for message in queue.messages_blocking() {
+//!         println!("New User: {}", message.unwrap());
+//!     }
+//! }
+//! ```
+//!
+#![warn(missing_docs)]
+
 extern crate postgres;
 extern crate retry;
 
@@ -7,19 +38,23 @@ use postgres::stmt::Statement;
 use retry::retry;
 use std::result;
 use std::time::Duration;
-// use std::error::Error as StdError;
 
 use error::Error;
+use iter::{MessageIter, NextMessageBlocking, NextMessagePending};
 
 pub mod error;
+pub mod iter;
 
+/// Convenience alias
 pub type Result<T> = result::Result<T, Error>;
 
+/// Highest level namespace. Constructs `Queue`s.
 pub struct PqBus {
     name: String,
     conn: Connection,
 }
 
+/// A named message queue
 pub struct Queue<'a> {
     notifications: Notifications<'a>,
     pop_stmt: Statement<'a>,
@@ -28,6 +63,13 @@ pub struct Queue<'a> {
     size_stmt: Statement<'a>,
 }
 
+/// Constructs a new PqBus
+///
+/// # Example
+///
+/// ```rust,no_run
+/// let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
+/// ```
 pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus>
     where S: Into<String>,
           T: Into<String>
@@ -63,6 +105,7 @@ impl PqBus {
         format!("pqbus_{}_{}_queue", self.name, queue_name.into())
     }
 
+    /// Constructs a queue on the bus from the given `name`.
     pub fn queue<'a>(&'a self, name: &str) -> Result<Queue<'a>> {
         let table_name = self.table_name(name);
         try!(self.conn
@@ -139,7 +182,7 @@ impl<'a> Queue<'a> {
         }
     }
 
-    /// Pops a message from the queue. Blocks if there are none pending.
+    /// Pops a message from the queue. Blocks for duration of `timeout` if there are none pending.
     pub fn pop_wait(&self, timeout: Duration) -> Result<Option<String>> {
         {
             let p = try!(self.pop());
@@ -227,63 +270,14 @@ impl<'a> Queue<'a> {
         self.notifications.blocking_iter().next();
     }
 
-    /// Returns an iterator over pending messages
+    /// Returns an iterator over pending messages. Ends when the queue is empty.
     pub fn messages(&'a self) -> MessageIter<'a, NextMessagePending> {
         MessageIter::new(self, NextMessagePending {})
     }
 
     /// Returns an iterator over messages that blocks until a message is received if none are pending.
+    /// This function never returns.
     pub fn messages_blocking(&'a self) -> MessageIter<'a, NextMessageBlocking> {
         MessageIter::new(self, NextMessageBlocking {})
-    }
-}
-
-pub trait NextMessage {
-    fn next(&self, &Queue) -> Option<Result<String>>;
-}
-
-pub struct MessageIter<'a, N>
-    where N: NextMessage
-{
-    next_message: N,
-    queue: &'a Queue<'a>,
-}
-
-impl<'a, N> MessageIter<'a, N>
-    where N: NextMessage
-{
-    fn new(queue: &'a Queue<'a>, n: N) -> Self {
-        MessageIter {
-            next_message: n,
-            queue: queue,
-        }
-    }
-}
-
-impl<'a, N> Iterator for MessageIter<'a, N>
-    where N: NextMessage
-{
-    type Item = Result<String>;
-
-    fn next(&mut self) -> Option<Result<String>> {
-        self.next_message.next(self.queue)
-    }
-}
-
-pub struct NextMessageBlocking;
-impl NextMessage for NextMessageBlocking {
-    fn next(&self, q: &Queue) -> Option<Result<String>> {
-        Some(q.pop_blocking())
-    }
-}
-
-pub struct NextMessagePending;
-impl NextMessage for NextMessagePending {
-    fn next(&self, q: &Queue) -> Option<Result<String>> {
-        match q.pop() {
-            Ok(Some(m)) => Some(Ok(m)),
-            Ok(None) => None,
-            Err(e) => Some(Err(e)),
-        }
     }
 }
