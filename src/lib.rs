@@ -27,7 +27,8 @@
 //! }
 //! ```
 //!
-#![warn(missing_docs)]
+#![crate_type = "lib"]
+#![deny(missing_docs)]
 
 extern crate postgres;
 extern crate retry;
