@@ -247,3 +247,19 @@ fn test_pop_wait_some() {
     assert!(result.is_some());
     assert_eq!("test", &result.unwrap());
 }
+
+#[test]
+fn test_iter_nth() {
+    drop_table("pqbus_iter_nth_a_queue");
+    let bus = pqbus::new(db_uri(), "iter_nth").unwrap();
+    let queue = bus.queue("a").unwrap();
+    assert!(queue.is_empty().unwrap());
+
+    queue.push("1").unwrap();
+    queue.push("2").unwrap();
+    queue.push("3").unwrap();
+    queue.push("4").unwrap();
+
+    let third = queue.messages().nth(2).unwrap();
+    assert_eq!("3", &third.unwrap());
+}
