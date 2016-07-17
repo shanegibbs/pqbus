@@ -1,8 +1,10 @@
+//! Error types
+
 // use postgres::error::ConnectError;
 use postgres::error::Error as PostgresError;
 use retry::RetryError;
 
-// An error encountered in pqbus
+/// PqBus error types
 #[derive(Debug)]
 pub enum Error {
     Push(PostgresError),
