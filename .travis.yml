@@ -30,6 +30,6 @@ script:
   - travis-cargo build
   - travis-cargo test
 after_success:
-  - travis-cargo coveralls --verify
+  - travis-cargo --only 1.8.0 coveralls --verify
 env:
   - RUST_TEST_THREADS=4
