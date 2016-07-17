@@ -4,6 +4,7 @@ rust:
   - 1.9.0
   - stable
   - beta
+cache: cargo
 addons:
   apt:
     packages:
@@ -17,19 +18,15 @@ before_install:
   - sudo apt-get install net-tools postgresql-9.5
   - sudo sed -i 's/md5/trust/g' /etc/postgresql/9.5/main/pg_hba.conf
   - sudo sed -i 's/5433/5432/g' /etc/postgresql/9.5/main/postgresql.conf
+  - sudo /etc/init.d/postgresql restart 9.5
   - sudo /etc/init.d/postgresql reload 9.5
   - sudo /etc/init.d/postgresql start 9.5
-  - sleep 10
-  - sudo /etc/init.d/postgresql restart 9.5
-  - sleep 10
 before_script:
   - psql postgres://postgres@localhost/postgres -c 'create database pqbus_test'
   - pip install 'travis-cargo<0.2' --user
   - export PATH=$HOME/.local/bin:$PATH
 script:
-  - travis-cargo build
-  - travis-cargo test
+  - travis-cargo -q build
+  - travis-cargo -q test
 after_success:
-  - travis-cargo --only 1.8.0 coveralls --verify
-env:
-  - RUST_TEST_THREADS=4
+  - travis-cargo -q --only 1.8.0 coveralls --verify
