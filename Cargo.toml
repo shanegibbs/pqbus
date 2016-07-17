@@ -5,3 +5,4 @@ authors = ["Shane Gibbs <shane@hands.net.nz>"]
 
 [dependencies]
 postgres = "0.11"
+retry = "0.4.0"
