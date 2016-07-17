@@ -17,9 +17,19 @@ Pop messages
 
 ```rust
 let bus = pqbus::new("postgres://postgres@localhost/pqbus", "test").unwrap();
+let mut queue = bus.queue("checker").unwrap();
+for message in queue.messages() {
+    println!("Received: {}", message);
+});
+```
+
+or
+
+```rust
+let bus = pqbus::new("postgres://postgres@localhost/pqbus", "test").unwrap();
 let queue = bus.queue("checker").unwrap();
-queue.pop_callback(|body| {
-    println!("Received: {}", body);
+queue.pop_callback(|message| {
+    println!("Received: {}", message);
 });
 ```
 

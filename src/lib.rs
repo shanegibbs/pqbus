@@ -219,4 +219,20 @@ impl<'a> Queue<'a> {
         // self.notifications.timeout_iter(Duration::new(5, 0)).next();
         self.notifications.blocking_iter().next();
     }
+
+    pub fn messages(&self) -> MessageIter {
+        MessageIter { queue: self }
+    }
+}
+
+pub struct MessageIter<'a> {
+    queue: &'a Queue<'a>,
+}
+
+impl<'a> Iterator for MessageIter<'a> {
+    type Item = Result<String>;
+
+    fn next(&mut self) -> Option<Result<String>> {
+        Some(self.queue.pop())
+    }
 }
