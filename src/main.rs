@@ -27,7 +27,7 @@ fn run(db_uri: &String, cmd: &String) -> Result<i32, pqbus::error::Error> {
         "pop" => {
             // pop message
             let queue = try!(bus.queue("checker"));
-            let body = try!(queue.pop());
+            let body = try!(queue.pop_blocking());
             println!("Received: {}", body);
         }
 

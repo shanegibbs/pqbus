@@ -88,8 +88,21 @@ fn test_sequential_push_pop() {
     assert!(queue.is_empty().unwrap());
 
     queue.push("Hello World!").unwrap();
-    let result = queue.pop().unwrap();
-    assert_eq!("Hello World!".to_string(), result)
+    let result = queue.pop_blocking().unwrap();
+    assert_eq!("Hello World!".to_string(), result);
+}
+
+#[test]
+fn test_pop_blocking() {
+    drop_table("pqbus_attempt_pop_a_queue");
+    let bus = pqbus::new(db_uri(), "attempt_pop").unwrap();
+    let queue = bus.queue("a").unwrap();
+    assert!(queue.is_empty().unwrap());
+
+    queue.push("Hello World!").unwrap();
+
+    let result = queue.pop_blocking().unwrap();
+    assert_eq!("Hello World!".to_string(), result);
 }
 
 #[test]
@@ -109,8 +122,8 @@ fn test_one_bus_duel_queue_push_pop_in_order() {
     let result_a = queue_a.pop().unwrap();
     let result_b = queue_b.pop().unwrap();
 
-    assert_eq!("a".to_string(), result_a);
-    assert_eq!("b".to_string(), result_b);
+    assert_eq!(Some("a".to_string()), result_a);
+    assert_eq!(Some("b".to_string()), result_b);
 }
 
 #[test]
@@ -130,8 +143,8 @@ fn test_one_bus_duel_queue_push_pop_unorder() {
     let result_b = queue_b.pop().unwrap();
     let result_a = queue_a.pop().unwrap();
 
-    assert_eq!("a".to_string(), result_a);
-    assert_eq!("b".to_string(), result_b);
+    assert_eq!(Some("a".to_string()), result_a);
+    assert_eq!(Some("b".to_string()), result_b);
 }
 
 #[test]
@@ -145,7 +158,7 @@ fn test_multithread_push_pop() {
     let child = thread::spawn(move || {
         let bus = pqbus::new(db_uri(), "multithread_push_pop").unwrap();
         let queue = bus.queue("a").unwrap();
-        queue.pop()
+        queue.pop_blocking()
     });
 
     queue.push("a").unwrap();
@@ -190,7 +203,7 @@ fn test_multithread_push_pop_many() {
             let bus = pqbus::new(db_uri(), "multithread_push_pop_many").unwrap();
             let queue = bus.queue("a").unwrap();
             for _i in 0..work_per_worker {
-                let r = queue.pop().unwrap();
+                let r = queue.pop_blocking().unwrap();
                 let mut mine = results.lock().unwrap();
                 let n: i32 = FromStr::from_str(&r).unwrap();
                 mine.push(n);
@@ -249,9 +262,9 @@ fn test_pop_wait_some() {
 }
 
 #[test]
-fn test_iter_nth() {
-    drop_table("pqbus_iter_nth_a_queue");
-    let bus = pqbus::new(db_uri(), "iter_nth").unwrap();
+fn test_messages_iter_nth() {
+    drop_table("pqbus_messages_iter_nth_a_queue");
+    let bus = pqbus::new(db_uri(), "messages_iter_nth").unwrap();
     let queue = bus.queue("a").unwrap();
     assert!(queue.is_empty().unwrap());
 
@@ -262,4 +275,24 @@ fn test_iter_nth() {
 
     let third = queue.messages().nth(2).unwrap();
     assert_eq!("3", &third.unwrap());
+}
+
+#[test]
+fn test_messages_waiting_iter() {
+    drop_table("pqbus_iter_nth_a_queue");
+    let bus = pqbus::new(db_uri(), "iter_nth").unwrap();
+    let queue = bus.queue("a").unwrap();
+    assert!(queue.is_empty().unwrap());
+
+    queue.push("1").unwrap();
+    queue.push("2").unwrap();
+    queue.push("3").unwrap();
+    queue.push("4").unwrap();
+
+    let mut i = 0;
+    for _message in queue.messages() {
+        i += 1;
+    }
+
+    assert_eq!(4, i);
 }
