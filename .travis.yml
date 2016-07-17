@@ -1,32 +1,37 @@
 language: rust
 rust:
-  - 1.8.0
-  - 1.9.0
-  - stable
-  - beta
+- 1.8.0
+- 1.9.0
+- stable
+- beta
 cache: cargo
 addons:
   apt:
     packages:
-      - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
-      - binutils-dev # optional: only required for the --verify flag of coveralls
+    - libcurl4-openssl-dev
+    - libelf-dev
+    - libdw-dev
+    - binutils-dev
 before_install:
-  - sudo /etc/init.d/postgresql stop
-  - sudo apt-get update
-  - sudo apt-get install net-tools postgresql-9.5
-  - sudo sed -i 's/md5/trust/g' /etc/postgresql/9.5/main/pg_hba.conf
-  - sudo sed -i 's/5433/5432/g' /etc/postgresql/9.5/main/postgresql.conf
-  - sudo /etc/init.d/postgresql restart 9.5
-  - sudo /etc/init.d/postgresql reload 9.5
-  - sudo /etc/init.d/postgresql start 9.5
+- sudo /etc/init.d/postgresql stop
+- sudo apt-get update
+- sudo apt-get install net-tools postgresql-9.5
+- sudo sed -i 's/md5/trust/g' /etc/postgresql/9.5/main/pg_hba.conf
+- sudo sed -i 's/5433/5432/g' /etc/postgresql/9.5/main/postgresql.conf
+- sudo /etc/init.d/postgresql restart 9.5
+- sudo /etc/init.d/postgresql reload 9.5
+- sudo /etc/init.d/postgresql start 9.5
 before_script:
-  - psql postgres://postgres@localhost/postgres -c 'create database pqbus_test'
-  - pip install 'travis-cargo<0.2' --user
-  - export PATH=$HOME/.local/bin:$PATH
+- psql postgres://postgres@localhost/postgres -c 'create database pqbus_test'
+- pip install 'travis-cargo<0.2' --user
+- export PATH=$HOME/.local/bin:$PATH
 script:
-  - travis-cargo -q build
-  - travis-cargo -q test
+- travis-cargo -q build
+- travis-cargo -q test
+- travis-cargo -q doc
 after_success:
-  - travis-cargo -q --only 1.8.0 coveralls --verify
+- travis-cargo -q --only 1.8.0 coveralls --verify
+- travis-cargo --only stable doc-upload --branch master
+env:
+  global:
+    secure: nUfpJ3v36ykZX1DBQw58HR5/+Baq7vMO/V3ivlhdI2+D7d6V/zYYhy3v20SeyEExkuYS4FaNa4tmNz3ZKwiGpVDkLkWwnUMzTyOyd19fu7LpstduleFSvSTbFOPXFrJXKQR0zC0PPdmqfBVatVjkU51j4lDeI84vBWC/E1u2M4XPU2WfDoMbVSRELqWKoLOUghmt0oRcVMcvwMVQIiB7Huyk/OPWEtY+APiCqNi5HOah2XbtRBmjPXeRbCg9IrZGyv/yWW6f5EKY71DM8ipK64kp8q3zcKxOQJnzGTduuwYJar5jzMpyzY2H1TBcWvjRa1kCjoLbbS4sl2x0QA1PsWhjGtfNcKvZjrk4lksYhnuyuE7imWNroqx8WkcDrn/0gdUOACdmbWvtm8l81mYJdbvP/7a5+u3wPenWMZvLpJtJoq0r6LDGqKLM9jVSujKtce8TCPS4xF8CyGnIEIWy9SU0ZBWkMQeUsBCebFHxlhhglEU4Zy5+MiIBhUjxuk5uvlSafEP5RYisKrDcDbSBz3e8/abvMMrimcAeuY6oZDcVBVEBqB+Wc2Hr+tUL1MpS7yNEjb0ahECesH5t+eDTg1jycb2fqAOrmNkqMC7yng8IGNj9TT9VyR44d7YwEFMY8+3ffnCcTuPdnsa/2+pNBtkQlSa7iUq/wfnCUgdPxrs=
