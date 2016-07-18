@@ -6,7 +6,7 @@
 //! ```rust,no_run
 //! extern crate pqbus;
 //!
-//! use pqbus::{Queue ,StringMessage};
+//! use pqbus::{Queue, StringMessage};
 //!
 //! fn main() {
 //!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
@@ -28,6 +28,37 @@
 //!     for message in queue.messages_blocking() {
 //!         println!("New User: {}", message.unwrap());
 //!     }
+//! }
+//! ```
+//!
+//! ## Custom Messages
+//!
+//! Any struct that satisfies the trait bonds `From<Vec<u8>>` and `Into<Vec<u8>>` the can be sent
+//! over a queue.
+//!
+//! ```rust,no_run
+//! extern crate pqbus;
+//!
+//! struct User;
+//!
+//! impl Into<Vec<u8>> for User {
+//!     fn into(self) -> Vec<u8> {
+//!         vec![0, 1, 0, 1]
+//!     }
+//! }
+//!
+//! impl From<Vec<u8>> for User {
+//!     fn from(v: Vec<u8>) -> User {
+//!         User
+//!     }
+//! }
+//!
+//! fn main() {
+//!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
+//!     let queue = bus.queue("new_users").unwrap();
+//!
+//!     let user = User;
+//!     queue.push(user);
 //! }
 //! ```
 //!
