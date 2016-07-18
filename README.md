@@ -25,16 +25,6 @@ for message in queue.messages() {
 });
 ```
 
-or
-
-```rust
-let bus = pqbus::new("postgres://postgres@localhost/pqbus", "test").unwrap();
-let queue = bus.queue("checker").unwrap();
-queue.pop_callback(|message| {
-    println!("Received: {}", message);
-});
-```
-
 ## Cli Interface
 
 Push a message

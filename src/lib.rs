@@ -6,10 +6,12 @@
 //! ```rust,no_run
 //! extern crate pqbus;
 //!
+//! use pqbus::{Queue ,StringMessage};
+//!
 //! fn main() {
 //!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
 //!     let queue = bus.queue("new_users").unwrap();
-//!     queue.push("sgibbs");
+//!     queue.push(StringMessage::new("sgibbs"));
 //! }
 //! ```
 //!
@@ -18,9 +20,11 @@
 //! ```rust,no_run
 //! extern crate pqbus;
 //!
+//! use pqbus::{Queue, StringMessage};
+//!
 //! fn main() {
 //!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
-//!     let queue = bus.queue("new_users").unwrap();
+//!     let queue: Queue<StringMessage> = bus.queue("new_users").unwrap();
 //!     for message in queue.messages_blocking() {
 //!         println!("New User: {}", message.unwrap());
 //!     }
@@ -37,8 +41,10 @@ use postgres::{Connection, SslMode};
 use postgres::notification::Notifications;
 use postgres::stmt::Statement;
 use retry::retry;
+use std::fmt;
 use std::result;
 use std::time::Duration;
+use std::marker::PhantomData;
 
 use error::Error;
 use iter::{MessageIter, NextMessageBlocking, NextMessagePending};
@@ -56,12 +62,15 @@ pub struct PqBus {
 }
 
 /// A named message queue
-pub struct Queue<'a> {
+pub struct Queue<'a, T>
+    where T: From<Vec<u8>> + Into<Vec<u8>>
+{
     notifications: Notifications<'a>,
     pop_stmt: Statement<'a>,
     push_stmt: Statement<'a>,
     notify_stmt: Statement<'a>,
     size_stmt: Statement<'a>,
+    phantom: PhantomData<T>,
 }
 
 /// Constructs a new PqBus
@@ -107,13 +116,15 @@ impl PqBus {
     }
 
     /// Constructs a queue on the bus from the given `name`.
-    pub fn queue<'a>(&'a self, name: &str) -> Result<Queue<'a>> {
+    pub fn queue<'a, T>(&'a self, name: &str) -> Result<Queue<'a, T>>
+        where T: From<Vec<u8>> + Into<Vec<u8>>
+    {
         let table_name = self.table_name(name);
         try!(self.conn
             .execute(&format!(r#"
                 CREATE TABLE IF NOT EXISTS {} (
                     id SERIAL PRIMARY KEY,
-                    body VARCHAR NOT NULL,
+                    message bytea NOT NULL,
                     lock VARCHAR DEFAULT NULL
                 )"#,
                               table_name),
@@ -124,29 +135,32 @@ impl PqBus {
 }
 
 /// A push pop message queue.
-impl<'a> Queue<'a> {
+impl<'a, T> Queue<'a, T>
+    where T: From<Vec<u8>> + Into<Vec<u8>>
+{
     fn new(conn: &'a Connection, table_name: &String) -> Result<Self> {
         try!(conn.execute(&format!("LISTEN {}", table_name), &[]).map_err(|e| Error::Listen(e)));
         Ok(Queue {
             notifications: conn.notifications(),
             push_stmt:
-                try!(conn.prepare_cached(&format!("INSERT INTO {} (body) VALUES ($1)", table_name))),
+                try!(conn.prepare_cached(&format!("INSERT INTO {} (message) VALUES ($1)", table_name))),
             notify_stmt: try!(conn.prepare_cached(&format!("NOTIFY {}", table_name))),
             size_stmt: try!(conn.prepare_cached(&format!("SELECT count(*) FROM  {}", table_name))),
             pop_stmt: try!(conn.prepare_cached(&format!(r#"
                         UPDATE {n} q
                         SET lock = 'me'
                         FROM  (
-                           SELECT id,body
+                           SELECT id,message
                            FROM   {n}
                            WHERE  lock is NULL
                            LIMIT  1
                            FOR UPDATE SKIP LOCKED
                            ) sub
                         WHERE q.id = sub.id
-                        RETURNING q.id, q.body;
+                        RETURNING q.id, q.message;
                         "#,
                                                         n = table_name))),
+            phantom: PhantomData,
         })
     }
 
@@ -163,17 +177,19 @@ impl<'a> Queue<'a> {
     }
 
     /// Pushes a message into the queue.
-    pub fn push<S>(&self, body: S) -> Result<bool>
-        where S: Into<String>
+    pub fn push(&self, message: T) -> Result<bool>
+        where T: Into<Vec<u8>>
     {
-        // TODO use bytes for body. generics for conversion?
-        try!(self.push_stmt.execute(&[&body.into()]).map_err(|e| Error::Push(e)));
+        let b: Vec<u8> = message.into();
+        try!(self.push_stmt.execute(&[&b]).map_err(|e| Error::Push(e)));
         try!(self.notify_stmt.execute(&[]).map_err(|e| Error::Notify(e)));
         Ok(true)
     }
 
     /// Pops a message from the queue. Blocks if there are none pending.
-    pub fn pop_blocking(&self) -> Result<String> {
+    pub fn pop_blocking(&self) -> Result<T>
+        where T: From<Vec<u8>>
+    {
         loop {
             let p = try!(self.pop());
             if p.is_some() {
@@ -184,7 +200,9 @@ impl<'a> Queue<'a> {
     }
 
     /// Pops a message from the queue. Blocks for duration of `timeout` if there are none pending.
-    pub fn pop_wait(&self, timeout: Duration) -> Result<Option<String>> {
+    pub fn pop_wait(&self, timeout: Duration) -> Result<Option<T>>
+        where T: From<Vec<u8>>
+    {
         {
             let p = try!(self.pop());
             if p.is_some() {
@@ -203,7 +221,7 @@ impl<'a> Queue<'a> {
 
     /// Run a closure on messages in the queue. Blocks if there are none pending.
     pub fn pop_callback<F>(&self, work_fn: F) -> Result<bool>
-        where F: Fn(String)
+        where F: Fn(T)
     {
         loop {
             self.consume_pending_notifications();
@@ -213,7 +231,9 @@ impl<'a> Queue<'a> {
     }
 
     /// Pops a message from the queue if there is one pending.
-    pub fn pop(&self) -> Result<Option<String>> {
+    pub fn pop(&self) -> Result<Option<T>>
+        where T: From<Vec<u8>>
+    {
         let locked = try!(self.pop_stmt.query(&[]).map_err(|e| Error::Pop(e)));
         if locked.is_empty() {
             return Ok(None);
@@ -232,18 +252,19 @@ impl<'a> Queue<'a> {
             Some(Ok(r)) => r,
         };
 
-        let body: String = match locked_row.get_opt("body") {
+        let message: Vec<u8> = match locked_row.get_opt("message") {
             None => {
-                println!("No body obtained");
+                println!("No message obtained");
                 return Ok(None);
             }
             Some(Err(e)) => {
-                println!("Failed to convert body value: {}", e);
+                println!("Failed to convert message value: {}", e);
                 return Ok(None);
             }
             Some(Ok(r)) => r,
         };
-        return Ok(Some(body));
+
+        return Ok(Some(message.into()));
     }
 
     fn consume_pending_notifications(&self) {
@@ -253,14 +274,15 @@ impl<'a> Queue<'a> {
     }
 
     fn consume_pending_items<F>(&self, work_fn: F) -> Result<u32>
-        where F: Fn(String)
+        where F: Fn(T),
+              T: From<Vec<u8>>
     {
         let mut i = 0;
         loop {
             match try!(self.pop()) {
                 None => return Ok(i),
-                Some(body) => {
-                    work_fn(body);
+                Some(message) => {
+                    work_fn(message);
                     i += 1;
                 }
             }
@@ -272,13 +294,50 @@ impl<'a> Queue<'a> {
     }
 
     /// Returns an iterator over pending messages. Ends when the queue is empty.
-    pub fn messages(&'a self) -> MessageIter<'a, NextMessagePending> {
+    pub fn messages(&'a self) -> MessageIter<'a, NextMessagePending, T> {
         MessageIter::new(self, NextMessagePending {})
     }
 
     /// Returns an iterator over messages that blocks until a message is received if none are pending.
     /// This function never returns.
-    pub fn messages_blocking(&'a self) -> MessageIter<'a, NextMessageBlocking> {
+    pub fn messages_blocking(&'a self) -> MessageIter<'a, NextMessageBlocking, T> {
         MessageIter::new(self, NextMessageBlocking {})
+    }
+}
+
+/// Message containing a utf8 String
+pub struct StringMessage {
+    body: String,
+}
+
+impl StringMessage {
+    /// Construct a new StringMessage from `s`.
+    pub fn new<S>(s: S) -> Self
+        where S: Into<String>
+    {
+        StringMessage { body: s.into() }
+    }
+
+    /// Returns a reference to the inner `String`.
+    pub fn body(&self) -> &String {
+        &self.body
+    }
+}
+
+impl fmt::Display for StringMessage {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.body)
+    }
+}
+
+impl Into<Vec<u8>> for StringMessage {
+    fn into(self) -> Vec<u8> {
+        self.body.into()
+    }
+}
+
+impl From<Vec<u8>> for StringMessage {
+    fn from(v: Vec<u8>) -> StringMessage {
+        StringMessage { body: String::from_utf8(v).unwrap() }
     }
 }
