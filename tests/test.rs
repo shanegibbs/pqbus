@@ -11,7 +11,8 @@ use std::sync::{Arc, Mutex};
 use std::str::FromStr;
 use std::thread;
 
-use pqbus::{Queue, StringMessage};
+use pqbus::Queue;
+use pqbus::messages::StringMessage;
 
 fn db_uri() -> String {
     env::var("TEST_DB_URI").unwrap_or("postgres://postgres@localhost/pqbus_test".to_string())
