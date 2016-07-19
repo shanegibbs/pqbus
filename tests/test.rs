@@ -68,13 +68,10 @@ fn test_valid_bus_name() {
 fn test_valid_queue_name() {
     test_setup();
     let bus = pqbus::new(db_uri(), "work").unwrap();
-    let queue = bus.queue("bad-name");
+    let queue: Result<Queue<StringMessage>, pqbus::error::Error> = bus.queue("bad-name");
     match queue.as_ref() {
         Err(&Error::InvalidQueueName(ref n)) => assert_eq!("bad-name", n),
         _ => unreachable!(),
-    }
-    if queue.is_ok() {
-        queue.unwrap().push(StringMessage::new("a")).unwrap();
     }
 }
 
@@ -84,9 +81,7 @@ fn test_push() {
     drop_table("pqbus_push_a_queue");
     let bus = pqbus::new(db_uri(), "push").unwrap();
     let queue = bus.queue("a").unwrap();
-
     queue.push(StringMessage::new("a")).unwrap();
-
 }
 
 #[test]
