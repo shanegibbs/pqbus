@@ -1,4 +1,5 @@
 extern crate pqbus;
+extern crate env_logger;
 extern crate postgres;
 extern crate retry;
 
@@ -13,6 +14,14 @@ use std::thread;
 
 use pqbus::Queue;
 use pqbus::messages::StringMessage;
+use pqbus::error::Error;
+
+struct TestInit;
+
+fn test_setup() -> TestInit {
+    let _ = env_logger::init();
+    TestInit
+}
 
 fn db_uri() -> String {
     env::var("TEST_DB_URI").unwrap_or("postgres://postgres@localhost/pqbus_test".to_string())
@@ -40,12 +49,38 @@ fn drop_table(name: &str) {
 
 #[test]
 fn test_connect_fail() {
+    test_setup();
     let bus = pqbus::new("bla", "work");
     assert!(bus.is_err());
 }
 
 #[test]
+fn test_valid_bus_name() {
+    test_setup();
+    let bus = pqbus::new(db_uri(), "bad-name");
+    match bus {
+        Err(Error::InvalidBusName(n)) => assert_eq!("bad-name", &n),
+        _ => unreachable!(),
+    }
+}
+
+#[test]
+fn test_valid_queue_name() {
+    test_setup();
+    let bus = pqbus::new(db_uri(), "work").unwrap();
+    let queue = bus.queue("bad-name");
+    match queue.as_ref() {
+        Err(&Error::InvalidQueueName(ref n)) => assert_eq!("bad-name", n),
+        _ => unreachable!(),
+    }
+    if queue.is_ok() {
+        queue.unwrap().push(StringMessage::new("a")).unwrap();
+    }
+}
+
+#[test]
 fn test_push() {
+    test_setup();
     drop_table("pqbus_push_a_queue");
     let bus = pqbus::new(db_uri(), "push").unwrap();
     let queue = bus.queue("a").unwrap();
@@ -56,6 +91,7 @@ fn test_push() {
 
 #[test]
 fn test_empty() {
+    test_setup();
     drop_table("pqbus_test_empty_test_queue_queue");
     let bus = pqbus::new(db_uri(), "test_empty").unwrap();
     let queue = bus.queue("test_queue").unwrap();
@@ -69,6 +105,7 @@ fn test_empty() {
 
 #[test]
 fn test_size() {
+    test_setup();
     drop_table("pqbus_test_size_test_queue_queue");
     let bus = pqbus::new(db_uri(), "test_size").unwrap();
     let queue = bus.queue("test_queue").unwrap();
@@ -85,6 +122,7 @@ fn test_size() {
 
 #[test]
 fn test_sequential_push_pop() {
+    test_setup();
     drop_table("pqbus_test_sequential_push_pop_test_queue_queue");
     let bus = pqbus::new(db_uri(), "test_sequential_push_pop").unwrap();
     let queue = bus.queue("test_queue").unwrap();
@@ -97,6 +135,7 @@ fn test_sequential_push_pop() {
 
 #[test]
 fn test_pop_blocking() {
+    test_setup();
     drop_table("pqbus_attempt_pop_a_queue");
     let bus = pqbus::new(db_uri(), "attempt_pop").unwrap();
     let queue = bus.queue("a").unwrap();
@@ -110,6 +149,7 @@ fn test_pop_blocking() {
 
 #[test]
 fn test_one_bus_duel_queue_push_pop_in_order() {
+    test_setup();
     drop_table("pqbus_test_sequential_push_pop_test_queue_a_queue");
     drop_table("pqbus_test_sequential_push_pop_test_queue_b_queue");
 
@@ -131,6 +171,7 @@ fn test_one_bus_duel_queue_push_pop_in_order() {
 
 #[test]
 fn test_one_bus_duel_queue_push_pop_unorder() {
+    test_setup();
     drop_table("pqbus_one_bus_duel_queue_push_pop_unorder_test_queue_a_queue");
     drop_table("pqbus_one_bus_duel_queue_push_pop_unorder_test_queue_b_queue");
 
@@ -152,6 +193,7 @@ fn test_one_bus_duel_queue_push_pop_unorder() {
 
 #[test]
 fn test_multithread_push_pop() {
+    test_setup();
     drop_table("pqbus_multithread_push_pop_a_queue");
 
     let bus = pqbus::new(db_uri(), "multithread_push_pop").unwrap();
@@ -172,6 +214,7 @@ fn test_multithread_push_pop() {
 
 #[test]
 fn test_multithread_push_pop_many() {
+    test_setup();
     drop_table("pqbus_multithread_push_pop_many_a_queue");
     let bus = pqbus::new(db_uri(), "multithread_push_pop_many").unwrap();
     let queue: Queue<StringMessage> = bus.queue("a").unwrap();
@@ -229,6 +272,7 @@ fn test_multithread_push_pop_many() {
 
 #[test]
 fn test_pop_wait_none() {
+    test_setup();
     drop_table("pqbus_pop_wait_none_a_queue");
     let bus = pqbus::new(db_uri(), "pop_wait_none").unwrap();
     let queue: Queue<StringMessage> = bus.queue("a").unwrap();
@@ -243,6 +287,7 @@ fn test_pop_wait_none() {
 
 #[test]
 fn test_pop_wait_some() {
+    test_setup();
     drop_table("pqbus_pop_wait_some_a_queue");
     let bus = pqbus::new(db_uri(), "pop_wait_some").unwrap();
     let queue = bus.queue("a").unwrap();
@@ -266,6 +311,7 @@ fn test_pop_wait_some() {
 
 #[test]
 fn test_messages_iter_nth() {
+    test_setup();
     drop_table("pqbus_messages_iter_nth_a_queue");
     let bus = pqbus::new(db_uri(), "messages_iter_nth").unwrap();
     let queue = bus.queue("a").unwrap();
@@ -282,6 +328,7 @@ fn test_messages_iter_nth() {
 
 #[test]
 fn test_messages_waiting_iter() {
+    test_setup();
     drop_table("pqbus_iter_nth_a_queue");
     let bus = pqbus::new(db_uri(), "iter_nth").unwrap();
     let queue = bus.queue("a").unwrap();

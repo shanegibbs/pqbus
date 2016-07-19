@@ -4,5 +4,10 @@ version = "0.1.0"
 authors = ["Shane Gibbs <shane@hands.net.nz>"]
 
 [dependencies]
+log = "0.3"
 postgres = "0.11"
 retry = "0.4.0"
+regex = "0.1"
+
+[dev-dependencies]
+env_logger = "0.3"
