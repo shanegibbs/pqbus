@@ -30,7 +30,7 @@ script:
 - travis-cargo -q test
 - travis-cargo -q doc
 after_success:
-- travis-cargo -q --only 1.8.0 coveralls --verify
+- RUST_LOG=pqbus=trace travis-cargo -q --only 1.8.0 coveralls --verify
 - travis-cargo --only stable doc-upload --branch master
 env:
   global:
