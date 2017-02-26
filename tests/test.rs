@@ -13,7 +13,6 @@ use std::str::FromStr;
 use std::thread;
 
 use pqbus::Queue;
-use pqbus::messages::StringMessage;
 use pqbus::error::Error;
 
 struct TestInit;
@@ -68,7 +67,7 @@ fn test_valid_bus_name() {
 fn test_valid_queue_name() {
     test_setup();
     let bus = pqbus::new(db_uri(), "work").unwrap();
-    let queue: Result<Queue<StringMessage>, pqbus::error::Error> = bus.queue("bad-name");
+    let queue: Result<Queue<String>, pqbus::error::Error> = bus.queue("bad-name");
     match queue.as_ref() {
         Err(&Error::InvalidQueueName(ref n)) => assert_eq!("bad-name", n),
         _ => unreachable!(),
@@ -81,7 +80,7 @@ fn test_push() {
     drop_table("pqbus_push_a_queue");
     let bus = pqbus::new(db_uri(), "push").unwrap();
     let queue = bus.queue("a").unwrap();
-    queue.push(StringMessage::new("a")).unwrap();
+    queue.push("a".to_string()).unwrap();
 }
 
 #[test]
@@ -92,9 +91,9 @@ fn test_empty() {
     let queue = bus.queue("test_queue").unwrap();
 
     assert!(queue.is_empty().unwrap());
-    queue.push(StringMessage::new("a")).unwrap();
+    queue.push("a".to_string()).unwrap();
     assert!(!queue.is_empty().unwrap());
-    queue.push(StringMessage::new("a")).unwrap();
+    queue.push("a".to_string()).unwrap();
     assert!(!queue.is_empty().unwrap());
 }
 
@@ -107,10 +106,10 @@ fn test_size() {
 
     assert_eq!(0, queue.size().unwrap());
     assert!(queue.is_empty().unwrap());
-    queue.push(StringMessage::new("a")).unwrap();
+    queue.push("a".to_string()).unwrap();
     assert_eq!(1, queue.size().unwrap());
     assert!(!queue.is_empty().unwrap());
-    queue.push(StringMessage::new("a")).unwrap();
+    queue.push("a".to_string()).unwrap();
     assert_eq!(2, queue.size().unwrap());
     assert!(!queue.is_empty().unwrap());
 }
@@ -123,9 +122,9 @@ fn test_sequential_push_pop() {
     let queue = bus.queue("test_queue").unwrap();
     assert!(queue.is_empty().unwrap());
 
-    queue.push(StringMessage::new("Hello World!")).unwrap();
+    queue.push("Hello World!".to_string()).unwrap();
     let result = queue.pop_blocking().unwrap();
-    assert_eq!("Hello World!", result.body());
+    assert_eq!("Hello World!", &result);
 }
 
 #[test]
@@ -136,10 +135,10 @@ fn test_pop_blocking() {
     let queue = bus.queue("a").unwrap();
     assert!(queue.is_empty().unwrap());
 
-    queue.push(StringMessage::new("Hello World!")).unwrap();
+    queue.push("Hello World!".to_string()).unwrap();
 
     let result = queue.pop_blocking().unwrap();
-    assert_eq!("Hello World!", result.body());
+    assert_eq!("Hello World!", &result);
 }
 
 #[test]
@@ -154,14 +153,14 @@ fn test_one_bus_duel_queue_push_pop_in_order() {
     assert!(queue_a.is_empty().unwrap());
     assert!(queue_b.is_empty().unwrap());
 
-    queue_a.push(StringMessage::new("a")).unwrap();
-    queue_b.push(StringMessage::new("b")).unwrap();
+    queue_a.push("a".to_string()).unwrap();
+    queue_b.push("b".to_string()).unwrap();
 
     let result_a = queue_a.pop().unwrap().unwrap();
     let result_b = queue_b.pop().unwrap().unwrap();
 
-    assert_eq!("a", result_a.body());
-    assert_eq!("b", result_b.body());
+    assert_eq!("a", &result_a);
+    assert_eq!("b", &result_b);
 }
 
 #[test]
@@ -176,14 +175,14 @@ fn test_one_bus_duel_queue_push_pop_unorder() {
     assert!(queue_a.is_empty().unwrap());
     assert!(queue_b.is_empty().unwrap());
 
-    queue_a.push(StringMessage::new("a")).unwrap();
-    queue_b.push(StringMessage::new("b")).unwrap();
+    queue_a.push("a".to_string()).unwrap();
+    queue_b.push("b".to_string()).unwrap();
 
     let result_b = queue_b.pop().unwrap().unwrap();
     let result_a = queue_a.pop().unwrap().unwrap();
 
-    assert_eq!("a", result_a.body());
-    assert_eq!("b", result_b.body());
+    assert_eq!("a", &result_a);
+    assert_eq!("b", &result_b);
 }
 
 #[test]
@@ -192,19 +191,19 @@ fn test_multithread_push_pop() {
     drop_table("pqbus_multithread_push_pop_a_queue");
 
     let bus = pqbus::new(db_uri(), "multithread_push_pop").unwrap();
-    let queue: Queue<StringMessage> = bus.queue("a").unwrap();
+    let queue: Queue<String> = bus.queue("a").unwrap();
     assert!(queue.is_empty().unwrap());
 
     let child = thread::spawn(move || {
         let bus = pqbus::new(db_uri(), "multithread_push_pop").unwrap();
-        let queue: Queue<StringMessage> = bus.queue("a").unwrap();
+        let queue: Queue<String> = bus.queue("a").unwrap();
         queue.pop_blocking()
     });
 
-    queue.push(StringMessage::new("a")).unwrap();
+    queue.push("a".to_string()).unwrap();
     let res = child.join().unwrap();
 
-    assert_eq!("a", res.unwrap().body());
+    assert_eq!("a", &res.unwrap());
 }
 
 #[test]
@@ -212,7 +211,7 @@ fn test_multithread_push_pop_many() {
     test_setup();
     drop_table("pqbus_multithread_push_pop_many_a_queue");
     let bus = pqbus::new(db_uri(), "multithread_push_pop_many").unwrap();
-    let queue: Queue<StringMessage> = bus.queue("a").unwrap();
+    let queue: Queue<String> = bus.queue("a").unwrap();
     assert!(queue.is_empty().unwrap());
 
     let publisher_count = 10;
@@ -231,7 +230,7 @@ fn test_multithread_push_pop_many() {
             let queue = bus.queue("a").unwrap();
             for j in 0..work_per_publisher {
                 let n = (i * work_per_publisher) + j;
-                queue.push(StringMessage::new(format!("{}", n))).unwrap();
+                queue.push(format!("{}", n)).unwrap();
             }
         }));
     }
@@ -244,9 +243,9 @@ fn test_multithread_push_pop_many() {
             let bus = pqbus::new(db_uri(), "multithread_push_pop_many").unwrap();
             let queue = bus.queue("a").unwrap();
             for _i in 0..work_per_worker {
-                let r: StringMessage = queue.pop_blocking().unwrap();
+                let r: String = queue.pop_blocking().unwrap();
                 let mut mine = results.lock().unwrap();
-                let n: i32 = FromStr::from_str(r.body()).unwrap();
+                let n: i32 = FromStr::from_str(&r).unwrap();
                 mine.push(n);
             }
         }));
@@ -270,7 +269,7 @@ fn test_pop_wait_none() {
     test_setup();
     drop_table("pqbus_pop_wait_none_a_queue");
     let bus = pqbus::new(db_uri(), "pop_wait_none").unwrap();
-    let queue: Queue<StringMessage> = bus.queue("a").unwrap();
+    let queue: Queue<String> = bus.queue("a").unwrap();
     assert!(queue.is_empty().unwrap());
 
     let result = queue.pop_wait(Duration::new(1, 0));
@@ -290,18 +289,18 @@ fn test_pop_wait_some() {
 
     let child = thread::spawn(|| {
         let bus = pqbus::new(db_uri(), "pop_wait_some").unwrap();
-        let queue: Queue<StringMessage> = bus.queue("a").unwrap();
+        let queue: Queue<String> = bus.queue("a").unwrap();
         queue.pop_wait(Duration::new(2, 0))
     });
 
     // crude
     thread::sleep(Duration::new(1, 0));
 
-    queue.push(StringMessage::new("test")).unwrap();
+    queue.push("test".to_string()).unwrap();
     let result = child.join().unwrap().unwrap();
 
     assert!(result.is_some());
-    assert_eq!("test", result.unwrap().body());
+    assert_eq!("test", &result.unwrap());
 }
 
 #[test]
@@ -312,13 +311,13 @@ fn test_messages_iter_nth() {
     let queue = bus.queue("a").unwrap();
     assert!(queue.is_empty().unwrap());
 
-    queue.push(StringMessage::new("1")).unwrap();
-    queue.push(StringMessage::new("2")).unwrap();
-    queue.push(StringMessage::new("3")).unwrap();
-    queue.push(StringMessage::new("4")).unwrap();
+    queue.push("1".to_string()).unwrap();
+    queue.push("2".to_string()).unwrap();
+    queue.push("3".to_string()).unwrap();
+    queue.push("4".to_string()).unwrap();
 
     let third = queue.messages().nth(2).unwrap();
-    assert_eq!("3", third.unwrap().body());
+    assert_eq!("3", &third.unwrap());
 }
 
 #[test]
@@ -329,10 +328,10 @@ fn test_messages_waiting_iter() {
     let queue = bus.queue("a").unwrap();
     assert!(queue.is_empty().unwrap());
 
-    queue.push(StringMessage::new("1")).unwrap();
-    queue.push(StringMessage::new("2")).unwrap();
-    queue.push(StringMessage::new("3")).unwrap();
-    queue.push(StringMessage::new("4")).unwrap();
+    queue.push("1".to_string()).unwrap();
+    queue.push("2".to_string()).unwrap();
+    queue.push("3".to_string()).unwrap();
+    queue.push("4".to_string()).unwrap();
 
     let mut i = 0;
     for _message in queue.messages() {

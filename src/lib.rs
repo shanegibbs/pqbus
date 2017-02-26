@@ -7,12 +7,11 @@
 //! extern crate pqbus;
 //!
 //! use pqbus::Queue;
-//! use pqbus::messages::StringMessage;
 //!
 //! fn main() {
 //!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
 //!     let queue = bus.queue("new_users").unwrap();
-//!     queue.push(StringMessage::new("sgibbs"));
+//!     queue.push("sgibbs".to_string());
 //! }
 //! ```
 //!
@@ -22,11 +21,10 @@
 //! extern crate pqbus;
 //!
 //! use pqbus::Queue;
-//! use pqbus::messages::StringMessage;
 //!
 //! fn main() {
 //!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
-//!     let queue: Queue<StringMessage> = bus.queue("new_users").unwrap();
+//!     let queue: Queue<String> = bus.queue("new_users").unwrap();
 //!     for message in queue.messages_blocking() {
 //!         println!("New User: {}", message.unwrap());
 //!     }
@@ -41,16 +39,18 @@
 //! ```rust,no_run
 //! extern crate pqbus;
 //!
+//! use pqbus::Message;
+//!
 //! struct User;
 //!
-//! impl Into<Vec<u8>> for User {
-//!     fn into(self) -> Vec<u8> {
-//!         vec![0, 1, 0, 1]
+//! impl Into<Message> for User {
+//!     fn into(self) -> Message {
+//!         Message::new(vec![])
 //!     }
 //! }
 //!
-//! impl From<Vec<u8>> for User {
-//!     fn from(v: Vec<u8>) -> User {
+//! impl From<Message> for User {
+//!     fn from(m: Message) -> User {
 //!         User
 //!     }
 //! }
@@ -69,7 +69,7 @@
 //! ```
 //!
 #![crate_type = "lib"]
-#![deny(missing_docs)]
+// #![deny(missing_docs)]
 
 #[macro_use]
 extern crate log;
@@ -85,7 +85,7 @@ use std::result;
 use std::time::Duration;
 use std::marker::PhantomData;
 use regex::Regex;
-
+pub use messages::{FromMessageBody, ToMessageBody, Message};
 use error::Error;
 use iter::{MessageIter, NextMessageBlocking, NextMessagePending};
 
@@ -104,7 +104,7 @@ pub struct PqBus {
 
 /// A named message queue
 pub struct Queue<'a, T>
-    where T: From<Vec<u8>> + Into<Vec<u8>>
+    where T: From<Message> + Into<Message>
 {
     notifications: Notifications<'a>,
     pop_stmt: Statement<'a>,
@@ -167,7 +167,7 @@ pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus>
 impl PqBus {
     /// Constructs a queue on the bus from the given `name`.
     pub fn queue<'a, N, T>(&'a self, name: N) -> Result<Queue<'a, T>>
-        where T: From<Vec<u8>> + Into<Vec<u8>>,
+        where T: From<Message> + Into<Message>,
               N: Into<String>
     {
         Queue::new(&self.conn, &name.into(), &self.name)
@@ -180,7 +180,7 @@ fn table_name_generator(bus: &String, queue: &String) -> String {
 
 /// A push pop message queue.
 impl<'a, T> Queue<'a, T>
-    where T: From<Vec<u8>> + Into<Vec<u8>>
+    where T: From<Message> + Into<Message>
 {
     fn new(conn: &'a Connection, name: &String, bus: &String) -> Result<Self> {
 
@@ -244,9 +244,9 @@ impl<'a, T> Queue<'a, T>
 
     /// Pushes a message into the queue.
     pub fn push(&self, message: T) -> Result<bool>
-        where T: Into<Vec<u8>>
     {
-        let b: Vec<u8> = message.into();
+        let message: Message = message.into();
+        let b = message.body();
         try!(self.push_stmt.execute(&[&b]).map_err(|e| Error::Push(e)));
         info!("Message pushed to queue {}.{}", self.bus, self.name);
 
@@ -258,7 +258,6 @@ impl<'a, T> Queue<'a, T>
 
     /// Pops a message from the queue. Blocks if there are none pending.
     pub fn pop_blocking(&self) -> Result<T>
-        where T: From<Vec<u8>>
     {
         loop {
             let p = try!(self.pop());
@@ -271,7 +270,7 @@ impl<'a, T> Queue<'a, T>
 
     /// Pops a message from the queue. Blocks for duration of `timeout` if there are none pending.
     pub fn pop_wait(&self, timeout: Duration) -> Result<Option<T>>
-        where T: From<Vec<u8>>
+        where T: From<Message>
     {
         {
             let p = try!(self.pop());
@@ -301,7 +300,7 @@ impl<'a, T> Queue<'a, T>
 
     /// Pops a message from the queue if there is one pending.
     pub fn pop(&self) -> Result<Option<T>>
-        where T: From<Vec<u8>>
+        where T: From<Message>
     {
         let locked = try!(self.pop_stmt.query(&[]).map_err(|e| Error::Pop(e)));
         if locked.is_empty() {
@@ -325,7 +324,7 @@ impl<'a, T> Queue<'a, T>
             Some(Ok(r)) => r,
         };
 
-        let message: Vec<u8> = match locked_row.get_opt("message") {
+        let body: Vec<u8> = match locked_row.get_opt("message") {
             None => {
                 warn!("No message column in {}.{}", self.bus, self.name);
                 return Ok(None);
@@ -339,6 +338,8 @@ impl<'a, T> Queue<'a, T>
             }
             Some(Ok(r)) => r,
         };
+
+        let message = Message::new(body);
 
         info!("Received message from {}.{}", self.bus, self.name);
 
@@ -354,8 +355,7 @@ impl<'a, T> Queue<'a, T>
     }
 
     fn consume_pending_items<F>(&self, work_fn: F) -> Result<u32>
-        where F: Fn(T),
-              T: From<Vec<u8>>
+        where F: Fn(T)
     {
         let mut i = 0;
         loop {
