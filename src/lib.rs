@@ -7,12 +7,11 @@
 //! extern crate pqbus;
 //!
 //! use pqbus::Queue;
-//! use pqbus::messages::StringMessage;
 //!
 //! fn main() {
 //!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
 //!     let queue = bus.queue("new_users").unwrap();
-//!     queue.push(StringMessage::new("sgibbs"));
+//!     queue.push("sgibbs");
 //! }
 //! ```
 //!
@@ -22,11 +21,10 @@
 //! extern crate pqbus;
 //!
 //! use pqbus::Queue;
-//! use pqbus::messages::StringMessage;
 //!
 //! fn main() {
 //!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
-//!     let queue: Queue<StringMessage> = bus.queue("new_users").unwrap();
+//!     let queue: Queue<String> = bus.queue("new_users").unwrap();
 //!     for message in queue.messages_blocking() {
 //!         println!("New User: {}", message.unwrap());
 //!     }
@@ -35,41 +33,40 @@
 //!
 //! ## Custom Messages
 //!
-//! Any struct that satisfies the trait bonds `From<Vec<u8>>` and `Into<Vec<u8>>` the can be sent
+//! Any struct that satisfies the trait bonds `ToMessageBody<E>` can be sent
 //! over a queue.
 //!
 //! ```rust,no_run
 //! extern crate pqbus;
 //!
+//! use pqbus::{Message, FromMessageBody, ToMessageBody};
+//!
+//! type MyErr = String;
+//!
 //! struct User;
 //!
-//! impl Into<Vec<u8>> for User {
-//!     fn into(self) -> Vec<u8> {
-//!         vec![0, 1, 0, 1]
+//! impl FromMessageBody<MyErr> for User {
+//!     fn from_message_body(m: Message) -> Result<Self, MyErr> {
+//!         Ok(User)
 //!     }
 //! }
 //!
-//! impl From<Vec<u8>> for User {
-//!     fn from(v: Vec<u8>) -> User {
-//!         User
+//! impl ToMessageBody<MyErr> for User {
+//!     fn to_message_body(self) -> Result<Vec<u8>, MyErr> {
+//!         Ok(vec![])
 //!     }
 //! }
 //!
 //! fn main() {
 //!     let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
 //!     let queue = bus.queue("new_users").unwrap();
-//!
-//!     {
-//!         let user = User;
-//!         queue.push(user);
-//!     }
-//!
-//!     let user = queue.pop();
+//!     queue.push(User).unwrap();
+//!     let user = queue.pop().unwrap();
 //! }
 //! ```
 //!
 #![crate_type = "lib"]
-#![deny(missing_docs)]
+// #![deny(missing_docs)]
 
 #[macro_use]
 extern crate log;
@@ -85,16 +82,17 @@ use std::result;
 use std::time::Duration;
 use std::marker::PhantomData;
 use regex::Regex;
-
-use error::Error;
+pub use messages::{FromMessageBody, ToMessageBody, Message};
+pub use error::{BusError, PushError, PopError};
 use iter::{MessageIter, NextMessageBlocking, NextMessagePending};
+use std::fmt;
 
-pub mod error;
-pub mod iter;
-pub mod messages;
+mod error;
+mod iter;
+mod messages;
 
 /// Convenience alias
-pub type Result<T> = result::Result<T, Error>;
+pub type BusResult<T> = result::Result<T, BusError>;
 
 /// Highest level namespace. Constructs `Queue`s.
 pub struct PqBus {
@@ -103,9 +101,7 @@ pub struct PqBus {
 }
 
 /// A named message queue
-pub struct Queue<'a, T>
-    where T: From<Vec<u8>> + Into<Vec<u8>>
-{
+pub struct Queue<'a, B> {
     notifications: Notifications<'a>,
     pop_stmt: Statement<'a>,
     push_stmt: Statement<'a>,
@@ -113,7 +109,7 @@ pub struct Queue<'a, T>
     size_stmt: Statement<'a>,
     name: String,
     bus: String,
-    phantom: PhantomData<T>,
+    phantom: PhantomData<B>,
 }
 
 /// Constructs a new PqBus
@@ -123,7 +119,7 @@ pub struct Queue<'a, T>
 /// ```rust,no_run
 /// let bus = pqbus::new("postgres://postgres@localhost/pqbus", "myapp").unwrap();
 /// ```
-pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus>
+pub fn new<S, T>(db_uri: S, name: T) -> BusResult<PqBus>
     where S: Into<String>,
           T: Into<String>
 {
@@ -131,7 +127,7 @@ pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus>
     let name = name.into();
 
     if invalid_name(&name) {
-        return Err(Error::InvalidBusName(name));
+        return Err(BusError::InvalidBusName(name));
     }
 
     let mut last_err = None;
@@ -151,7 +147,7 @@ pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus>
                 None => error!("Giving up on connection to postgresql: {}", e),
                 Some(e) => error!("{}", e),
             }
-            return Err(Error::Connection(uri, e));
+            return Err(BusError::Connection(uri, e));
         }
         Ok(c) => c.unwrap(),
     };
@@ -166,9 +162,8 @@ pub fn new<S, T>(db_uri: S, name: T) -> Result<PqBus>
 
 impl PqBus {
     /// Constructs a queue on the bus from the given `name`.
-    pub fn queue<'a, N, T>(&'a self, name: N) -> Result<Queue<'a, T>>
-        where T: From<Vec<u8>> + Into<Vec<u8>>,
-              N: Into<String>
+    pub fn queue<'a, N, T>(&'a self, name: N) -> BusResult<Queue<'a, T>>
+        where N: Into<String>
     {
         Queue::new(&self.conn, &name.into(), &self.name)
     }
@@ -179,20 +174,18 @@ fn table_name_generator(bus: &String, queue: &String) -> String {
 }
 
 /// A push pop message queue.
-impl<'a, T> Queue<'a, T>
-    where T: From<Vec<u8>> + Into<Vec<u8>>
-{
-    fn new(conn: &'a Connection, name: &String, bus: &String) -> Result<Self> {
+impl<'a, B> Queue<'a, B> {
+    fn new(conn: &'a Connection, name: &String, bus: &String) -> BusResult<Self> {
 
         if invalid_name(name) {
-            return Err(Error::InvalidQueueName(name.clone()));
+            return Err(BusError::InvalidQueueName(name.clone()));
         }
 
         info!("Creating queue {}.{}", bus, name);
 
         let table_name = table_name_generator(bus, name);
 
-        try!(conn.execute(&format!(r#"
+        conn.execute(&format!(r#"
                 CREATE TABLE IF NOT EXISTS {} (
                     id SERIAL PRIMARY KEY,
                     message bytea NOT NULL,
@@ -200,17 +193,17 @@ impl<'a, T> Queue<'a, T>
                 )"#,
                               table_name),
                      &[])
-            .map_err(|e| Error::Create(e)));
+            .map_err(|e| BusError::Create(e))?;
 
-        try!(conn.execute(&format!("LISTEN {}", table_name), &[]).map_err(|e| Error::Listen(e)));
+        conn.execute(&format!("LISTEN {}", table_name), &[]).map_err(|e| BusError::Listen(e))?;
 
         Ok(Queue {
             notifications: conn.notifications(),
             push_stmt:
-                try!(conn.prepare_cached(&format!("INSERT INTO {} (message) VALUES ($1)", table_name))),
-            notify_stmt: try!(conn.prepare_cached(&format!("NOTIFY {}", table_name))),
-            size_stmt: try!(conn.prepare_cached(&format!("SELECT count(*) FROM  {}", table_name))),
-            pop_stmt: try!(conn.prepare_cached(&format!(r#"
+                conn.prepare_cached(&format!("INSERT INTO {} (message) VALUES ($1)", table_name))?,
+            notify_stmt: conn.prepare_cached(&format!("NOTIFY {}", table_name))?,
+            size_stmt: conn.prepare_cached(&format!("SELECT count(*) FROM  {}", table_name))?,
+            pop_stmt: conn.prepare_cached(&format!(r#"
                         UPDATE {n} q
                         SET lock = 'me'
                         FROM  (
@@ -223,7 +216,7 @@ impl<'a, T> Queue<'a, T>
                         WHERE q.id = sub.id
                         RETURNING q.id, q.message;
                         "#,
-                                                        n = table_name))),
+                                         n = table_name))?,
             name: name.clone(),
             bus: bus.clone(),
             phantom: PhantomData,
@@ -231,56 +224,56 @@ impl<'a, T> Queue<'a, T>
     }
 
     /// Returns the number of messages in the queue.
-    pub fn size(&self) -> Result<i64> {
-        let result = try!(self.size_stmt.query(&[]).map_err(|e| Error::Size(e)));
+    pub fn size(&self) -> BusResult<i64> {
+        let result = self.size_stmt.query(&[]).map_err(|e| BusError::Size(e))?;
         let row = result.get(0);
         Ok(row.get("count"))
     }
 
     /// Determines if there are any pending messages.
-    pub fn is_empty(&self) -> Result<bool> {
-        Ok(try!(self.size()) == 0)
+    pub fn is_empty(&self) -> BusResult<bool> {
+        Ok(self.size()? == 0)
     }
 
     /// Pushes a message into the queue.
-    pub fn push(&self, message: T) -> Result<bool>
-        where T: Into<Vec<u8>>
+    pub fn push<E>(&self, obj: B) -> Result<(), PushError<E>>
+        where B: ToMessageBody<E>
     {
-        let b: Vec<u8> = message.into();
-        try!(self.push_stmt.execute(&[&b]).map_err(|e| Error::Push(e)));
+        let body = obj.to_message_body().map_err(|e| PushError::BodySeralize(e))?;
+        self.push_stmt.execute(&[&body]).map_err(|e| PushError::Substrate(e))?;
         info!("Message pushed to queue {}.{}", self.bus, self.name);
 
-        try!(self.notify_stmt.execute(&[]).map_err(|e| Error::Notify(e)));
+        self.notify_stmt.execute(&[]).map_err(|e| PushError::Substrate(e))?;
         debug!("Sent push notification to queue {}.{}", self.bus, self.name);
 
-        Ok(true)
+        Ok(())
     }
 
     /// Pops a message from the queue. Blocks if there are none pending.
-    pub fn pop_blocking(&self) -> Result<T>
-        where T: From<Vec<u8>>
+    pub fn pop_blocking<E>(&self) -> Result<B, PopError<E>>
+        where B: FromMessageBody<E>
     {
         loop {
-            let p = try!(self.pop());
+            let p = self.pop()?;
             if p.is_some() {
                 return Ok(p.unwrap());
             }
-            try!(self.handle_notification(self.notifications.blocking_iter()));
+            self.handle_notification(self.notifications.blocking_iter())?;
         }
     }
 
     /// Pops a message from the queue. Blocks for duration of `timeout` if there are none pending.
-    pub fn pop_wait(&self, timeout: Duration) -> Result<Option<T>>
-        where T: From<Vec<u8>>
+    pub fn pop_wait<E>(&self, timeout: Duration) -> Result<Option<B>, PopError<E>>
+        where B: FromMessageBody<E>
     {
         {
-            let p = try!(self.pop());
+            let p = self.pop()?;
             if p.is_some() {
                 return Ok(p);
             }
         }
-        if let Some(_n) = try!(self.handle_notification(self.notifications.timeout_iter(timeout))) {
-            let p = try!(self.pop());
+        if let Some(_n) = self.handle_notification(self.notifications.timeout_iter(timeout))? {
+            let p = self.pop()?;
             if p.is_some() {
                 return Ok(p);
             }
@@ -289,21 +282,23 @@ impl<'a, T> Queue<'a, T>
     }
 
     /// Run a closure on messages in the queue. Blocks if there are none pending.
-    pub fn pop_callback<F>(&self, work_fn: F) -> Result<bool>
-        where F: Fn(T)
+    pub fn pop_callback<F, E>(&self, work_fn: F) -> Result<bool, BusError>
+        where F: Fn(B),
+              B: FromMessageBody<E>,
+              E: fmt::Display
     {
         loop {
-            try!(self.consume_pending_notifications());
-            try!(self.consume_pending_items(&work_fn));
-            try!(self.wait_for_next_notification());
+            self.consume_pending_notifications()?;
+            self.consume_pending_items(&work_fn)?;
+            self.wait_for_next_notification()?;
         }
     }
 
     /// Pops a message from the queue if there is one pending.
-    pub fn pop(&self) -> Result<Option<T>>
-        where T: From<Vec<u8>>
+    pub fn pop<E>(&self) -> Result<Option<B>, PopError<E>>
+        where B: FromMessageBody<E>
     {
-        let locked = try!(self.pop_stmt.query(&[]).map_err(|e| Error::Pop(e)));
+        let locked = self.pop_stmt.query(&[]).map_err(|e| PopError::Pop(e))?;
         if locked.is_empty() {
             debug!("No message available in {}.{}", self.bus, self.name);
             return Ok(None);
@@ -325,7 +320,7 @@ impl<'a, T> Queue<'a, T>
             Some(Ok(r)) => r,
         };
 
-        let message: Vec<u8> = match locked_row.get_opt("message") {
+        let body: Vec<u8> = match locked_row.get_opt("message") {
             None => {
                 warn!("No message column in {}.{}", self.bus, self.name);
                 return Ok(None);
@@ -340,26 +335,29 @@ impl<'a, T> Queue<'a, T>
             Some(Ok(r)) => r,
         };
 
+        let message = Message::new(body);
+
         info!("Received message from {}.{}", self.bus, self.name);
 
-        return Ok(Some(message.into()));
+        return Ok(Some(B::from_message_body(message).map_err(|e| PopError::BodyDeseralize(e))?));
     }
 
-    fn consume_pending_notifications(&self) -> Result<Option<Notification>> {
+    fn consume_pending_notifications(&self) -> BusResult<Option<Notification>> {
         let mut last = None;
         while !&self.notifications.is_empty() {
-            last = try!(self.handle_notification(self.notifications.iter()));
+            last = self.handle_notification(self.notifications.iter())?;
         }
         Ok(last)
     }
 
-    fn consume_pending_items<F>(&self, work_fn: F) -> Result<u32>
-        where F: Fn(T),
-              T: From<Vec<u8>>
+    fn consume_pending_items<F, E>(&self, work_fn: F) -> Result<u32, BusError>
+        where F: Fn(B),
+              B: FromMessageBody<E>,
+              E: fmt::Display
     {
         let mut i = 0;
         loop {
-            match try!(self.pop()) {
+            match self.pop()? {
                 None => return Ok(i),
                 Some(message) => {
                     work_fn(message);
@@ -369,11 +367,11 @@ impl<'a, T> Queue<'a, T>
         }
     }
 
-    fn wait_for_next_notification(&self) -> Result<Option<Notification>> {
-        Ok(try!(self.handle_notification(self.notifications.blocking_iter())))
+    fn wait_for_next_notification(&self) -> BusResult<Option<Notification>> {
+        Ok(self.handle_notification(self.notifications.blocking_iter())?)
     }
 
-    fn handle_notification<N>(&self, mut n: N) -> Result<Option<Notification>>
+    fn handle_notification<N>(&self, mut n: N) -> BusResult<Option<Notification>>
         where N: Iterator<Item = postgres::Result<Notification>>
     {
         match n.next() {
@@ -386,7 +384,7 @@ impl<'a, T> Queue<'a, T>
                        self.bus,
                        self.name,
                        e);
-                Err(Error::ReceiveNotification(e))
+                Err(BusError::ReceiveNotification(e))
             }
             Some(Ok(n)) => {
                 debug!("Received push notification from {}.{}: pid={}, payload={}",
@@ -400,13 +398,18 @@ impl<'a, T> Queue<'a, T>
     }
 
     /// Returns an iterator over pending messages. Ends when the queue is empty.
-    pub fn messages(&'a self) -> MessageIter<'a, NextMessagePending, T> {
+    pub fn messages<'queue, E>(&'queue self) -> MessageIter<'a, 'queue, NextMessagePending, B, E>
+        where B: FromMessageBody<E>
+    {
         MessageIter::new(self, NextMessagePending {})
     }
 
     /// Returns an iterator over messages that blocks until a message is received if none are pending.
     /// This function never returns.
-    pub fn messages_blocking(&'a self) -> MessageIter<'a, NextMessageBlocking, T> {
+    pub fn messages_blocking<'queue, E>(&'queue self)
+                                        -> MessageIter<'a, 'queue, NextMessageBlocking, B, E>
+        where B: FromMessageBody<E>
+    {
         MessageIter::new(self, NextMessageBlocking {})
     }
 }
