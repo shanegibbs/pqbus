@@ -12,8 +12,7 @@ use std::sync::{Arc, Mutex};
 use std::str::FromStr;
 use std::thread;
 
-use pqbus::Queue;
-use pqbus::error::Error;
+use pqbus::{Queue, BusError};
 
 struct TestInit;
 
@@ -58,7 +57,7 @@ fn test_valid_bus_name() {
     test_setup();
     let bus = pqbus::new(db_uri(), "bad-name");
     match bus {
-        Err(Error::InvalidBusName(n)) => assert_eq!("bad-name", &n),
+        Err(BusError::InvalidBusName(n)) => assert_eq!("bad-name", &n),
         _ => unreachable!(),
     }
 }
@@ -67,9 +66,9 @@ fn test_valid_bus_name() {
 fn test_valid_queue_name() {
     test_setup();
     let bus = pqbus::new(db_uri(), "work").unwrap();
-    let queue: Result<Queue<String>, pqbus::error::Error> = bus.queue("bad-name");
+    let queue: Result<Queue<String>, BusError> = bus.queue("bad-name");
     match queue.as_ref() {
-        Err(&Error::InvalidQueueName(ref n)) => assert_eq!("bad-name", n),
+        Err(&BusError::InvalidQueueName(ref n)) => assert_eq!("bad-name", n),
         _ => unreachable!(),
     }
 }

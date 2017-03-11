@@ -7,7 +7,7 @@ use std::fmt;
 
 /// PqBus error types
 #[derive(Debug)]
-pub enum Error {
+pub enum BusError {
     /// Failed to push message.
     Push(PostgresError),
     /// Failed to pop message.
@@ -30,32 +30,83 @@ pub enum Error {
     InvalidBusName(String),
     /// Name of queue does not match regex
     InvalidQueueName(String),
+    Generic(String),
 }
 
-impl fmt::Display for Error {
+/// Queue push errors
+#[derive(Debug)]
+pub enum PushError<E> {
+    Substrate(PostgresError),
+    BodySeralize(E),
+    Generic(String),
+}
+
+/// Queue pop errors
+#[derive(Debug)]
+pub enum PopError<E> {
+    Pop(PostgresError),
+    /// Failed to pop message.
+    BodyDeseralize(E),
+    Generic(String),
+}
+
+impl<E> From<BusError> for PopError<E> {
+    fn from(e: BusError) -> Self {
+        PopError::Generic(format!("{}", e))
+    }
+}
+
+impl<E> From<PushError<E>> for BusError
+    where PushError<E>: fmt::Display
+{
+    fn from(e: PushError<E>) -> Self {
+        BusError::Generic(format!("{}", e))
+    }
+}
+
+impl<E> From<PopError<E>> for BusError
+    where PopError<E>: fmt::Display
+{
+    fn from(e: PopError<E>) -> Self {
+        BusError::Generic(format!("{}", e))
+    }
+}
+
+impl From<PostgresError> for BusError {
+    fn from(err: PostgresError) -> BusError {
+        BusError::Sql(err)
+    }
+}
+
+impl<E> fmt::Display for PopError<E>
+    where E: fmt::Display
+{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::PopError::*;
         match *self {
-            Error::Push(ref e) => write!(f, "Message push failed: {}", e),
-            Error::Pop(ref e) => write!(f, "Message pop failed: {}", e),
-            Error::Notify(ref e) => write!(f, "Queue push notification failed: {}", e),
-            Error::Listen(ref e) => {
-                write!(f, "Failed to register listener form queue updates: {}", e)
-            }
-            Error::ReceiveNotification(ref e) => write!(f, "Failed to receive notification: {}", e),
-            Error::Create(ref e) => write!(f, "Failed to create queue: {}", e),
-            Error::Size(ref e) => write!(f, "Unable to get size of queue: {}", e),
-            Error::Connection(ref uri, ref e) => {
-                write!(f, "Failed to connect to bus {}: {}", uri, e)
-            }
-            Error::Sql(ref e) => write!(f, "SQL query failed: {}", e),
-            Error::InvalidBusName(ref e) => write!(f, "Invalid bus name: {}", e),
-            Error::InvalidQueueName(ref e) => write!(f, "Invalid queue name: {}", e),
+            Pop(ref e) => write!(f, "{}", e),
+            BodyDeseralize(ref e) => write!(f, "{}", e),
+            Generic(ref e) => write!(f, "{}", e),
         }
     }
 }
 
-impl From<PostgresError> for Error {
-    fn from(err: PostgresError) -> Error {
-        Error::Sql(err)
+impl fmt::Display for BusError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use self::BusError::*;
+        match *self {
+            Push(ref e) => write!(f, "Message push failed: {}", e),
+            Pop(ref e) => write!(f, "Message pop failed: {}", e),
+            Notify(ref e) => write!(f, "Queue push notification failed: {}", e),
+            Listen(ref e) => write!(f, "Failed to register listener form queue updates: {}", e),
+            ReceiveNotification(ref e) => write!(f, "Failed to receive notification: {}", e),
+            Create(ref e) => write!(f, "Failed to create queue: {}", e),
+            Size(ref e) => write!(f, "Unable to get size of queue: {}", e),
+            Connection(ref uri, ref e) => write!(f, "Failed to connect to bus {}: {}", uri, e),
+            Sql(ref e) => write!(f, "SQL query failed: {}", e),
+            InvalidBusName(ref e) => write!(f, "Invalid bus name: {}", e),
+            InvalidQueueName(ref e) => write!(f, "Invalid queue name: {}", e),
+            Generic(ref e) => write!(f, "{}", e),
+        }
     }
 }
