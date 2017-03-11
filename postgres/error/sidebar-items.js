@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ConnectError","Reasons a new Postgres connection could fail."],["Error","An error encountered when communicating with the Postgres server."],["ErrorPosition","Represents the position of an error in a query."],["SqlState","SQLSTATE error codes"]],"struct":[["DbError","A Postgres error or notice."]]});

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `pqbus` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, pqbus">
+
+    <title>pqbus - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'pqbus', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>pqbus</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/pqbus/lib.rs.html#1-420' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>A simple event driven highly available message queue backed with PostgreSQL,
+focused on stability and performance.</p>
+
+<h2 id='producer' class='section-header'><a href='#producer'>Producer</a></h2>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>pqbus</span>;
+
+<span class='kw'>use</span> <span class='ident'>pqbus</span>::<span class='ident'>Queue</span>;
+
+<span class='kw'>fn</span> <span class='ident'>main</span>() {
+    <span class='kw'>let</span> <span class='ident'>bus</span> <span class='op'>=</span> <span class='ident'>pqbus</span>::<span class='ident'>new</span>(<span class='string'>&quot;postgres://postgres@localhost/pqbus&quot;</span>, <span class='string'>&quot;myapp&quot;</span>).<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> <span class='ident'>queue</span> <span class='op'>=</span> <span class='ident'>bus</span>.<span class='ident'>queue</span>(<span class='string'>&quot;new_users&quot;</span>).<span class='ident'>unwrap</span>();
+    <span class='ident'>queue</span>.<span class='ident'>push</span>(<span class='string'>&quot;sgibbs&quot;</span>);
+}</pre>
+
+<h2 id='consumer' class='section-header'><a href='#consumer'>Consumer</a></h2>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>pqbus</span>;
+
+<span class='kw'>use</span> <span class='ident'>pqbus</span>::<span class='ident'>Queue</span>;
+
+<span class='kw'>fn</span> <span class='ident'>main</span>() {
+    <span class='kw'>let</span> <span class='ident'>bus</span> <span class='op'>=</span> <span class='ident'>pqbus</span>::<span class='ident'>new</span>(<span class='string'>&quot;postgres://postgres@localhost/pqbus&quot;</span>, <span class='string'>&quot;myapp&quot;</span>).<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> <span class='ident'>queue</span>: <span class='ident'>Queue</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>bus</span>.<span class='ident'>queue</span>(<span class='string'>&quot;new_users&quot;</span>).<span class='ident'>unwrap</span>();
+    <span class='kw'>for</span> <span class='ident'>message</span> <span class='kw'>in</span> <span class='ident'>queue</span>.<span class='ident'>messages_blocking</span>() {
+        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;New User: {}&quot;</span>, <span class='ident'>message</span>.<span class='ident'>unwrap</span>());
+    }
+}</pre>
+
+<h2 id='custom-messages' class='section-header'><a href='#custom-messages'>Custom Messages</a></h2>
+<p>Any struct that satisfies the trait bonds <code>ToMessageBody&lt;E&gt;</code> can be sent
+over a queue.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>pqbus</span>;
+
+<span class='kw'>use</span> <span class='ident'>pqbus</span>::{<span class='ident'>Message</span>, <span class='ident'>FromMessageBody</span>, <span class='ident'>ToMessageBody</span>};
+
+<span class='kw'>type</span> <span class='ident'>MyErr</span> <span class='op'>=</span> <span class='ident'>String</span>;
+
+<span class='kw'>struct</span> <span class='ident'>User</span>;
+
+<span class='kw'>impl</span> <span class='ident'>FromMessageBody</span><span class='op'>&lt;</span><span class='ident'>MyErr</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>User</span> {
+    <span class='kw'>fn</span> <span class='ident'>from_message_body</span>(<span class='ident'>m</span>: <span class='ident'>Message</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>MyErr</span><span class='op'>&gt;</span> {
+        <span class='prelude-val'>Ok</span>(<span class='ident'>User</span>)
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>ToMessageBody</span><span class='op'>&lt;</span><span class='ident'>MyErr</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>User</span> {
+    <span class='kw'>fn</span> <span class='ident'>to_message_body</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>MyErr</span><span class='op'>&gt;</span> {
+        <span class='prelude-val'>Ok</span>(<span class='macro'>vec</span><span class='macro'>!</span>[])
+    }
+}
+
+<span class='kw'>fn</span> <span class='ident'>main</span>() {
+    <span class='kw'>let</span> <span class='ident'>bus</span> <span class='op'>=</span> <span class='ident'>pqbus</span>::<span class='ident'>new</span>(<span class='string'>&quot;postgres://postgres@localhost/pqbus&quot;</span>, <span class='string'>&quot;myapp&quot;</span>).<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> <span class='ident'>queue</span> <span class='op'>=</span> <span class='ident'>bus</span>.<span class='ident'>queue</span>(<span class='string'>&quot;new_users&quot;</span>).<span class='ident'>unwrap</span>();
+    <span class='ident'>queue</span>.<span class='ident'>push</span>(<span class='ident'>User</span>).<span class='ident'>unwrap</span>();
+    <span class='kw'>let</span> <span class='ident'>user</span> <span class='op'>=</span> <span class='ident'>queue</span>.<span class='ident'>pop</span>().<span class='ident'>unwrap</span>();
+}</pre>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Message.html'
+                                  title='pqbus::Message'>Message</a></td>
+                           <td class='docblock-short'>
+                                <p>Raw message format</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.PqBus.html'
+                                  title='pqbus::PqBus'>PqBus</a></td>
+                           <td class='docblock-short'>
+                                <p>Highest level namespace. Constructs <code>Queue</code>s.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Queue.html'
+                                  title='pqbus::Queue'>Queue</a></td>
+                           <td class='docblock-short'>
+                                <p>A named message queue</p>
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.BusError.html'
+                                  title='pqbus::BusError'>BusError</a></td>
+                           <td class='docblock-short'>
+                                <p>PqBus error types</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.PopError.html'
+                                  title='pqbus::PopError'>PopError</a></td>
+                           <td class='docblock-short'>
+                                <p>Queue pop errors</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.PushError.html'
+                                  title='pqbus::PushError'>PushError</a></td>
+                           <td class='docblock-short'>
+                                <p>Queue push errors</p>
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.FromMessageBody.html'
+                                  title='pqbus::FromMessageBody'>FromMessageBody</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.ToMessageBody.html'
+                                  title='pqbus::ToMessageBody'>ToMessageBody</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.new.html'
+                                  title='pqbus::new'>new</a></td>
+                           <td class='docblock-short'>
+                                <p>Constructs a new PqBus</p>
+                           </td>
+                       </tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='type' href='type.BusResult.html'
+                                  title='pqbus::BusResult'>BusResult</a></td>
+                           <td class='docblock-short'>
+                                <p>Convenience alias</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "pqbus";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

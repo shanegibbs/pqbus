@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `SqlState` enum in crate `postgres`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, SqlState">
+
+    <title>postgres::error::SqlState - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>postgres</a>::<wbr><a href='index.html'>error</a></p><script>window.sidebarCurrent = {name: 'SqlState', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>postgres</a>::<wbr><a href='index.html'>error</a>::<wbr><a class='enum' href=''>SqlState</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/postgres/error/sqlstate.rs.html#6-481' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum SqlState {
+    SuccessfulCompletion,
+    Warning,
+    DynamicResultSetsReturned,
+    ImplicitZeroBitPadding,
+    NullValueEliminatedInSetFunction,
+    PrivilegeNotGranted,
+    PrivilegeNotRevoked,
+    WarningStringDataRightTruncation,
+    DeprecatedFeature,
+    NoData,
+    NoAdditionalDynamicResultSetsReturned,
+    SqlStatementNotYetComplete,
+    ConnectionException,
+    ConnectionDoesNotExist,
+    ConnectionFailure,
+    SqlclientUnableToEstablishSqlconnection,
+    SqlserverRejectedEstablishmentOfSqlconnection,
+    TransactionResolutionUnknown,
+    ProtocolViolation,
+    TriggeredActionException,
+    FeatureNotSupported,
+    InvalidTransactionInitiation,
+    LocatorException,
+    InvalidLocatorSpecification,
+    InvalidGrantor,
+    InvalidGrantOperation,
+    InvalidRoleSpecification,
+    DiagnosticsException,
+    StackedDiagnosticsAccessedWithoutActiveHandler,
+    CaseNotFound,
+    CardinalityViolation,
+    DataException,
+    ArraySubscriptError,
+    CharacterNotInRepertoire,
+    DatetimeFieldOverflow,
+    DivisionByZero,
+    ErrorInAssignment,
+    EscapeCharacterConflict,
+    IndicatorOverflow,
+    IntervalFieldOverflow,
+    InvalidArgumentForLogarithm,
+    InvalidArgumentForNtileFunction,
+    InvalidArgumentForNthValueFunction,
+    InvalidArgumentForPowerFunction,
+    InvalidArgumentForWidthBucketFunction,
+    InvalidCharacterValueForCast,
+    InvalidDatetimeFormat,
+    InvalidEscapeCharacter,
+    InvalidEscapeOctet,
+    InvalidEscapeSequence,
+    NonstandardUseOfEscapeCharacter,
+    InvalidIndicatorParameterValue,
+    InvalidParameterValue,
+    InvalidRegularExpression,
+    InvalidRowCountInLimitClause,
+    InvalidRowCountInResultOffsetClause,
+    InvalidTablesampleArgument,
+    InvalidTablesampleRepeat,
+    InvalidTimeZoneDisplacementValue,
+    InvalidUseOfEscapeCharacter,
+    MostSpecificTypeMismatch,
+    DataNullValueNotAllowed,
+    NullValueNoIndicatorParameter,
+    NumericValueOutOfRange,
+    StringDataLengthMismatch,
+    DataStringDataRightTruncation,
+    SubstringError,
+    TrimError,
+    UnterminatedCString,
+    ZeroLengthCharacterString,
+    FloatingPointException,
+    InvalidTextRepresentation,
+    InvalidBinaryRepresentation,
+    BadCopyFileFormat,
+    UntranslatableCharacter,
+    NotAnXmlDocument,
+    InvalidXmlDocument,
+    InvalidXmlContent,
+    InvalidXmlComment,
+    InvalidXmlProcessingInstruction,
+    IntegrityConstraintViolation,
+    RestrictViolation,
+    NotNullViolation,
+    ForeignKeyViolation,
+    UniqueViolation,
+    CheckViolation,
+    ExclusionViolation,
+    InvalidCursorState,
+    InvalidTransactionState,
+    ActiveSqlTransaction,
+    BranchTransactionAlreadyActive,
+    HeldCursorRequiresSameIsolationLevel,
+    InappropriateAccessModeForBranchTransaction,
+    InappropriateIsolationLevelForBranchTransaction,
+    NoActiveSqlTransactionForBranchTransaction,
+    ReadOnlySqlTransaction,
+    SchemaAndDataStatementMixingNotSupported,
+    NoActiveSqlTransaction,
+    InFailedSqlTransaction,
+    InvalidSqlStatementName,
+    TriggeredDataChangeViolation,
+    InvalidAuthorizationSpecification,
+    InvalidPassword,
+    DependentPrivilegeDescriptorsStillExist,
+    DependentObjectsStillExist,
+    InvalidTransactionTermination,
+    SqlRoutineException,
+    FunctionExecutedNoReturnStatement,
+    SqlRoutineModifyingSqlDataNotPermitted,
+    SqlRoutineProhibitedSqlStatementAttempted,
+    SqlRoutineReadingSqlDataNotPermitted,
+    InvalidCursorName,
+    ExternalRoutineException,
+    ContainingSqlNotPermitted,
+    ForeignRoutineModifyingSqlDataNotPermitted,
+    ForeignRoutineProhibitedSqlStatementAttempted,
+    ForeignRoutineReadingSqlDataNotPermitted,
+    ExternalRoutineInvocationException,
+    InvalidSqlstateReturned,
+    ExternalRoutineInvocationNullValueNotAllowed,
+    TriggerProtocolViolated,
+    SrfProtocolViolated,
+    EventTriggerProtocolViolated,
+    SavepointException,
+    InvalidSavepointSpecification,
+    InvalidCatalogName,
+    InvalidSchemaName,
+    TransactionRollback,
+    TransactionIntegrityConstraintViolation,
+    SerializationFailure,
+    StatementCompletionUnknown,
+    DeadlockDetected,
+    SyntaxErrorOrAccessRuleViolation,
+    SyntaxError,
+    InsufficientPrivilege,
+    CannotCoerce,
+    GroupingError,
+    WindowingError,
+    InvalidRecursion,
+    InvalidForeignKey,
+    InvalidName,
+    NameTooLong,
+    ReservedName,
+    DatatypeMismatch,
+    IndeterminateDatatype,
+    CollationMismatch,
+    IndeterminateCollation,
+    WrongObjectType,
+    UndefinedColumn,
+    UndefinedFunction,
+    UndefinedTable,
+    UndefinedParameter,
+    UndefinedObject,
+    DuplicateColumn,
+    DuplicateCursor,
+    DuplicateDatabase,
+    DuplicateFunction,
+    DuplicatePreparedStatement,
+    DuplicateSchema,
+    DuplicateTable,
+    DuplicateAlias,
+    DuplicateObject,
+    AmbiguousColumn,
+    AmbiguousFunction,
+    AmbiguousParameter,
+    AmbiguousAlias,
+    InvalidColumnReference,
+    InvalidColumnDefinition,
+    InvalidCursorDefinition,
+    InvalidDatabaseDefinition,
+    InvalidFunctionDefinition,
+    InvalidPreparedStatementDefinition,
+    InvalidSchemaDefinition,
+    InvalidTableDefinition,
+    InvalidObjectDefinition,
+    WithCheckOptionViolation,
+    InsufficientResources,
+    DiskFull,
+    OutOfMemory,
+    TooManyConnections,
+    ConfigurationLimitExceeded,
+    ProgramLimitExceeded,
+    StatementTooComplex,
+    TooManyColumns,
+    TooManyArguments,
+    ObjectNotInPrerequisiteState,
+    ObjectInUse,
+    CantChangeRuntimeParam,
+    LockNotAvailable,
+    OperatorIntervention,
+    QueryCanceled,
+    AdminShutdown,
+    CrashShutdown,
+    CannotConnectNow,
+    DatabaseDropped,
+    SystemError,
+    IoError,
+    UndefinedFile,
+    DuplicateFile,
+    ConfigFileError,
+    LockFileExists,
+    FdwError,
+    FdwColumnNameNotFound,
+    FdwDynamicParameterValueNeeded,
+    FdwFunctionSequenceError,
+    FdwInconsistentDescriptorInformation,
+    FdwInvalidAttributeValue,
+    FdwInvalidColumnName,
+    FdwInvalidColumnNumber,
+    FdwInvalidDataType,
+    FdwInvalidDataTypeDescriptors,
+    FdwInvalidDescriptorFieldIdentifier,
+    FdwInvalidHandle,
+    FdwInvalidOptionIndex,
+    FdwInvalidOptionName,
+    FdwInvalidStringLengthOrBufferLength,
+    FdwInvalidStringFormat,
+    FdwInvalidUseOfNullPointer,
+    FdwTooManyHandles,
+    FdwOutOfMemory,
+    FdwNoSchemas,
+    FdwOptionNameNotFound,
+    FdwReplyHandle,
+    FdwSchemaNotFound,
+    FdwTableNotFound,
+    FdwUnableToCreateExecution,
+    FdwUnableToCreateReply,
+    FdwUnableToEstablishConnection,
+    PlpgsqlError,
+    RaiseException,
+    NoDataFound,
+    TooManyRows,
+    AssertFailure,
+    InternalError,
+    DataCorrupted,
+    IndexCorrupted,
+    Other(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>),
+}</pre><div class='docblock'><p>SQLSTATE error codes</p>
+</div><h2 class='variants'>Variants</h2>
+<span id='variant.SuccessfulCompletion' class='variant'><span id='SuccessfulCompletion.v' class='invisible'><code>SuccessfulCompletion</code></span></span><div class='docblock'><p><code>00000</code></p>
+</div><span id='variant.Warning' class='variant'><span id='Warning.v' class='invisible'><code>Warning</code></span></span><div class='docblock'><p><code>01000</code></p>
+</div><span id='variant.DynamicResultSetsReturned' class='variant'><span id='DynamicResultSetsReturned.v' class='invisible'><code>DynamicResultSetsReturned</code></span></span><div class='docblock'><p><code>0100C</code></p>
+</div><span id='variant.ImplicitZeroBitPadding' class='variant'><span id='ImplicitZeroBitPadding.v' class='invisible'><code>ImplicitZeroBitPadding</code></span></span><div class='docblock'><p><code>01008</code></p>
+</div><span id='variant.NullValueEliminatedInSetFunction' class='variant'><span id='NullValueEliminatedInSetFunction.v' class='invisible'><code>NullValueEliminatedInSetFunction</code></span></span><div class='docblock'><p><code>01003</code></p>
+</div><span id='variant.PrivilegeNotGranted' class='variant'><span id='PrivilegeNotGranted.v' class='invisible'><code>PrivilegeNotGranted</code></span></span><div class='docblock'><p><code>01007</code></p>
+</div><span id='variant.PrivilegeNotRevoked' class='variant'><span id='PrivilegeNotRevoked.v' class='invisible'><code>PrivilegeNotRevoked</code></span></span><div class='docblock'><p><code>01006</code></p>
+</div><span id='variant.WarningStringDataRightTruncation' class='variant'><span id='WarningStringDataRightTruncation.v' class='invisible'><code>WarningStringDataRightTruncation</code></span></span><div class='docblock'><p><code>01004</code></p>
+</div><span id='variant.DeprecatedFeature' class='variant'><span id='DeprecatedFeature.v' class='invisible'><code>DeprecatedFeature</code></span></span><div class='docblock'><p><code>01P01</code></p>
+</div><span id='variant.NoData' class='variant'><span id='NoData.v' class='invisible'><code>NoData</code></span></span><div class='docblock'><p><code>02000</code></p>
+</div><span id='variant.NoAdditionalDynamicResultSetsReturned' class='variant'><span id='NoAdditionalDynamicResultSetsReturned.v' class='invisible'><code>NoAdditionalDynamicResultSetsReturned</code></span></span><div class='docblock'><p><code>02001</code></p>
+</div><span id='variant.SqlStatementNotYetComplete' class='variant'><span id='SqlStatementNotYetComplete.v' class='invisible'><code>SqlStatementNotYetComplete</code></span></span><div class='docblock'><p><code>03000</code></p>
+</div><span id='variant.ConnectionException' class='variant'><span id='ConnectionException.v' class='invisible'><code>ConnectionException</code></span></span><div class='docblock'><p><code>08000</code></p>
+</div><span id='variant.ConnectionDoesNotExist' class='variant'><span id='ConnectionDoesNotExist.v' class='invisible'><code>ConnectionDoesNotExist</code></span></span><div class='docblock'><p><code>08003</code></p>
+</div><span id='variant.ConnectionFailure' class='variant'><span id='ConnectionFailure.v' class='invisible'><code>ConnectionFailure</code></span></span><div class='docblock'><p><code>08006</code></p>
+</div><span id='variant.SqlclientUnableToEstablishSqlconnection' class='variant'><span id='SqlclientUnableToEstablishSqlconnection.v' class='invisible'><code>SqlclientUnableToEstablishSqlconnection</code></span></span><div class='docblock'><p><code>08001</code></p>
+</div><span id='variant.SqlserverRejectedEstablishmentOfSqlconnection' class='variant'><span id='SqlserverRejectedEstablishmentOfSqlconnection.v' class='invisible'><code>SqlserverRejectedEstablishmentOfSqlconnection</code></span></span><div class='docblock'><p><code>08004</code></p>
+</div><span id='variant.TransactionResolutionUnknown' class='variant'><span id='TransactionResolutionUnknown.v' class='invisible'><code>TransactionResolutionUnknown</code></span></span><div class='docblock'><p><code>08007</code></p>
+</div><span id='variant.ProtocolViolation' class='variant'><span id='ProtocolViolation.v' class='invisible'><code>ProtocolViolation</code></span></span><div class='docblock'><p><code>08P01</code></p>
+</div><span id='variant.TriggeredActionException' class='variant'><span id='TriggeredActionException.v' class='invisible'><code>TriggeredActionException</code></span></span><div class='docblock'><p><code>09000</code></p>
+</div><span id='variant.FeatureNotSupported' class='variant'><span id='FeatureNotSupported.v' class='invisible'><code>FeatureNotSupported</code></span></span><div class='docblock'><p><code>0A000</code></p>
+</div><span id='variant.InvalidTransactionInitiation' class='variant'><span id='InvalidTransactionInitiation.v' class='invisible'><code>InvalidTransactionInitiation</code></span></span><div class='docblock'><p><code>0B000</code></p>
+</div><span id='variant.LocatorException' class='variant'><span id='LocatorException.v' class='invisible'><code>LocatorException</code></span></span><div class='docblock'><p><code>0F000</code></p>
+</div><span id='variant.InvalidLocatorSpecification' class='variant'><span id='InvalidLocatorSpecification.v' class='invisible'><code>InvalidLocatorSpecification</code></span></span><div class='docblock'><p><code>0F001</code></p>
+</div><span id='variant.InvalidGrantor' class='variant'><span id='InvalidGrantor.v' class='invisible'><code>InvalidGrantor</code></span></span><div class='docblock'><p><code>0L000</code></p>
+</div><span id='variant.InvalidGrantOperation' class='variant'><span id='InvalidGrantOperation.v' class='invisible'><code>InvalidGrantOperation</code></span></span><div class='docblock'><p><code>0LP01</code></p>
+</div><span id='variant.InvalidRoleSpecification' class='variant'><span id='InvalidRoleSpecification.v' class='invisible'><code>InvalidRoleSpecification</code></span></span><div class='docblock'><p><code>0P000</code></p>
+</div><span id='variant.DiagnosticsException' class='variant'><span id='DiagnosticsException.v' class='invisible'><code>DiagnosticsException</code></span></span><div class='docblock'><p><code>0Z000</code></p>
+</div><span id='variant.StackedDiagnosticsAccessedWithoutActiveHandler' class='variant'><span id='StackedDiagnosticsAccessedWithoutActiveHandler.v' class='invisible'><code>StackedDiagnosticsAccessedWithoutActiveHandler</code></span></span><div class='docblock'><p><code>0Z002</code></p>
+</div><span id='variant.CaseNotFound' class='variant'><span id='CaseNotFound.v' class='invisible'><code>CaseNotFound</code></span></span><div class='docblock'><p><code>20000</code></p>
+</div><span id='variant.CardinalityViolation' class='variant'><span id='CardinalityViolation.v' class='invisible'><code>CardinalityViolation</code></span></span><div class='docblock'><p><code>21000</code></p>
+</div><span id='variant.DataException' class='variant'><span id='DataException.v' class='invisible'><code>DataException</code></span></span><div class='docblock'><p><code>22000</code></p>
+</div><span id='variant.ArraySubscriptError' class='variant'><span id='ArraySubscriptError.v' class='invisible'><code>ArraySubscriptError</code></span></span><div class='docblock'><p><code>2202E</code></p>
+</div><span id='variant.CharacterNotInRepertoire' class='variant'><span id='CharacterNotInRepertoire.v' class='invisible'><code>CharacterNotInRepertoire</code></span></span><div class='docblock'><p><code>22021</code></p>
+</div><span id='variant.DatetimeFieldOverflow' class='variant'><span id='DatetimeFieldOverflow.v' class='invisible'><code>DatetimeFieldOverflow</code></span></span><div class='docblock'><p><code>22008</code></p>
+</div><span id='variant.DivisionByZero' class='variant'><span id='DivisionByZero.v' class='invisible'><code>DivisionByZero</code></span></span><div class='docblock'><p><code>22012</code></p>
+</div><span id='variant.ErrorInAssignment' class='variant'><span id='ErrorInAssignment.v' class='invisible'><code>ErrorInAssignment</code></span></span><div class='docblock'><p><code>22005</code></p>
+</div><span id='variant.EscapeCharacterConflict' class='variant'><span id='EscapeCharacterConflict.v' class='invisible'><code>EscapeCharacterConflict</code></span></span><div class='docblock'><p><code>2200B</code></p>
+</div><span id='variant.IndicatorOverflow' class='variant'><span id='IndicatorOverflow.v' class='invisible'><code>IndicatorOverflow</code></span></span><div class='docblock'><p><code>22022</code></p>
+</div><span id='variant.IntervalFieldOverflow' class='variant'><span id='IntervalFieldOverflow.v' class='invisible'><code>IntervalFieldOverflow</code></span></span><div class='docblock'><p><code>22015</code></p>
+</div><span id='variant.InvalidArgumentForLogarithm' class='variant'><span id='InvalidArgumentForLogarithm.v' class='invisible'><code>InvalidArgumentForLogarithm</code></span></span><div class='docblock'><p><code>2201E</code></p>
+</div><span id='variant.InvalidArgumentForNtileFunction' class='variant'><span id='InvalidArgumentForNtileFunction.v' class='invisible'><code>InvalidArgumentForNtileFunction</code></span></span><div class='docblock'><p><code>22014</code></p>
+</div><span id='variant.InvalidArgumentForNthValueFunction' class='variant'><span id='InvalidArgumentForNthValueFunction.v' class='invisible'><code>InvalidArgumentForNthValueFunction</code></span></span><div class='docblock'><p><code>22016</code></p>
+</div><span id='variant.InvalidArgumentForPowerFunction' class='variant'><span id='InvalidArgumentForPowerFunction.v' class='invisible'><code>InvalidArgumentForPowerFunction</code></span></span><div class='docblock'><p><code>2201F</code></p>
+</div><span id='variant.InvalidArgumentForWidthBucketFunction' class='variant'><span id='InvalidArgumentForWidthBucketFunction.v' class='invisible'><code>InvalidArgumentForWidthBucketFunction</code></span></span><div class='docblock'><p><code>2201G</code></p>
+</div><span id='variant.InvalidCharacterValueForCast' class='variant'><span id='InvalidCharacterValueForCast.v' class='invisible'><code>InvalidCharacterValueForCast</code></span></span><div class='docblock'><p><code>22018</code></p>
+</div><span id='variant.InvalidDatetimeFormat' class='variant'><span id='InvalidDatetimeFormat.v' class='invisible'><code>InvalidDatetimeFormat</code></span></span><div class='docblock'><p><code>22007</code></p>
+</div><span id='variant.InvalidEscapeCharacter' class='variant'><span id='InvalidEscapeCharacter.v' class='invisible'><code>InvalidEscapeCharacter</code></span></span><div class='docblock'><p><code>22019</code></p>
+</div><span id='variant.InvalidEscapeOctet' class='variant'><span id='InvalidEscapeOctet.v' class='invisible'><code>InvalidEscapeOctet</code></span></span><div class='docblock'><p><code>2200D</code></p>
+</div><span id='variant.InvalidEscapeSequence' class='variant'><span id='InvalidEscapeSequence.v' class='invisible'><code>InvalidEscapeSequence</code></span></span><div class='docblock'><p><code>22025</code></p>
+</div><span id='variant.NonstandardUseOfEscapeCharacter' class='variant'><span id='NonstandardUseOfEscapeCharacter.v' class='invisible'><code>NonstandardUseOfEscapeCharacter</code></span></span><div class='docblock'><p><code>22P06</code></p>
+</div><span id='variant.InvalidIndicatorParameterValue' class='variant'><span id='InvalidIndicatorParameterValue.v' class='invisible'><code>InvalidIndicatorParameterValue</code></span></span><div class='docblock'><p><code>22010</code></p>
+</div><span id='variant.InvalidParameterValue' class='variant'><span id='InvalidParameterValue.v' class='invisible'><code>InvalidParameterValue</code></span></span><div class='docblock'><p><code>22023</code></p>
+</div><span id='variant.InvalidRegularExpression' class='variant'><span id='InvalidRegularExpression.v' class='invisible'><code>InvalidRegularExpression</code></span></span><div class='docblock'><p><code>2201B</code></p>
+</div><span id='variant.InvalidRowCountInLimitClause' class='variant'><span id='InvalidRowCountInLimitClause.v' class='invisible'><code>InvalidRowCountInLimitClause</code></span></span><div class='docblock'><p><code>2201W</code></p>
+</div><span id='variant.InvalidRowCountInResultOffsetClause' class='variant'><span id='InvalidRowCountInResultOffsetClause.v' class='invisible'><code>InvalidRowCountInResultOffsetClause</code></span></span><div class='docblock'><p><code>2201X</code></p>
+</div><span id='variant.InvalidTablesampleArgument' class='variant'><span id='InvalidTablesampleArgument.v' class='invisible'><code>InvalidTablesampleArgument</code></span></span><div class='docblock'><p><code>2202H</code></p>
+</div><span id='variant.InvalidTablesampleRepeat' class='variant'><span id='InvalidTablesampleRepeat.v' class='invisible'><code>InvalidTablesampleRepeat</code></span></span><div class='docblock'><p><code>2202G</code></p>
+</div><span id='variant.InvalidTimeZoneDisplacementValue' class='variant'><span id='InvalidTimeZoneDisplacementValue.v' class='invisible'><code>InvalidTimeZoneDisplacementValue</code></span></span><div class='docblock'><p><code>22009</code></p>
+</div><span id='variant.InvalidUseOfEscapeCharacter' class='variant'><span id='InvalidUseOfEscapeCharacter.v' class='invisible'><code>InvalidUseOfEscapeCharacter</code></span></span><div class='docblock'><p><code>2200C</code></p>
+</div><span id='variant.MostSpecificTypeMismatch' class='variant'><span id='MostSpecificTypeMismatch.v' class='invisible'><code>MostSpecificTypeMismatch</code></span></span><div class='docblock'><p><code>2200G</code></p>
+</div><span id='variant.DataNullValueNotAllowed' class='variant'><span id='DataNullValueNotAllowed.v' class='invisible'><code>DataNullValueNotAllowed</code></span></span><div class='docblock'><p><code>22004</code></p>
+</div><span id='variant.NullValueNoIndicatorParameter' class='variant'><span id='NullValueNoIndicatorParameter.v' class='invisible'><code>NullValueNoIndicatorParameter</code></span></span><div class='docblock'><p><code>22002</code></p>
+</div><span id='variant.NumericValueOutOfRange' class='variant'><span id='NumericValueOutOfRange.v' class='invisible'><code>NumericValueOutOfRange</code></span></span><div class='docblock'><p><code>22003</code></p>
+</div><span id='variant.StringDataLengthMismatch' class='variant'><span id='StringDataLengthMismatch.v' class='invisible'><code>StringDataLengthMismatch</code></span></span><div class='docblock'><p><code>22026</code></p>
+</div><span id='variant.DataStringDataRightTruncation' class='variant'><span id='DataStringDataRightTruncation.v' class='invisible'><code>DataStringDataRightTruncation</code></span></span><div class='docblock'><p><code>22001</code></p>
+</div><span id='variant.SubstringError' class='variant'><span id='SubstringError.v' class='invisible'><code>SubstringError</code></span></span><div class='docblock'><p><code>22011</code></p>
+</div><span id='variant.TrimError' class='variant'><span id='TrimError.v' class='invisible'><code>TrimError</code></span></span><div class='docblock'><p><code>22027</code></p>
+</div><span id='variant.UnterminatedCString' class='variant'><span id='UnterminatedCString.v' class='invisible'><code>UnterminatedCString</code></span></span><div class='docblock'><p><code>22024</code></p>
+</div><span id='variant.ZeroLengthCharacterString' class='variant'><span id='ZeroLengthCharacterString.v' class='invisible'><code>ZeroLengthCharacterString</code></span></span><div class='docblock'><p><code>2200F</code></p>
+</div><span id='variant.FloatingPointException' class='variant'><span id='FloatingPointException.v' class='invisible'><code>FloatingPointException</code></span></span><div class='docblock'><p><code>22P01</code></p>
+</div><span id='variant.InvalidTextRepresentation' class='variant'><span id='InvalidTextRepresentation.v' class='invisible'><code>InvalidTextRepresentation</code></span></span><div class='docblock'><p><code>22P02</code></p>
+</div><span id='variant.InvalidBinaryRepresentation' class='variant'><span id='InvalidBinaryRepresentation.v' class='invisible'><code>InvalidBinaryRepresentation</code></span></span><div class='docblock'><p><code>22P03</code></p>
+</div><span id='variant.BadCopyFileFormat' class='variant'><span id='BadCopyFileFormat.v' class='invisible'><code>BadCopyFileFormat</code></span></span><div class='docblock'><p><code>22P04</code></p>
+</div><span id='variant.UntranslatableCharacter' class='variant'><span id='UntranslatableCharacter.v' class='invisible'><code>UntranslatableCharacter</code></span></span><div class='docblock'><p><code>22P05</code></p>
+</div><span id='variant.NotAnXmlDocument' class='variant'><span id='NotAnXmlDocument.v' class='invisible'><code>NotAnXmlDocument</code></span></span><div class='docblock'><p><code>2200L</code></p>
+</div><span id='variant.InvalidXmlDocument' class='variant'><span id='InvalidXmlDocument.v' class='invisible'><code>InvalidXmlDocument</code></span></span><div class='docblock'><p><code>2200M</code></p>
+</div><span id='variant.InvalidXmlContent' class='variant'><span id='InvalidXmlContent.v' class='invisible'><code>InvalidXmlContent</code></span></span><div class='docblock'><p><code>2200N</code></p>
+</div><span id='variant.InvalidXmlComment' class='variant'><span id='InvalidXmlComment.v' class='invisible'><code>InvalidXmlComment</code></span></span><div class='docblock'><p><code>2200S</code></p>
+</div><span id='variant.InvalidXmlProcessingInstruction' class='variant'><span id='InvalidXmlProcessingInstruction.v' class='invisible'><code>InvalidXmlProcessingInstruction</code></span></span><div class='docblock'><p><code>2200T</code></p>
+</div><span id='variant.IntegrityConstraintViolation' class='variant'><span id='IntegrityConstraintViolation.v' class='invisible'><code>IntegrityConstraintViolation</code></span></span><div class='docblock'><p><code>23000</code></p>
+</div><span id='variant.RestrictViolation' class='variant'><span id='RestrictViolation.v' class='invisible'><code>RestrictViolation</code></span></span><div class='docblock'><p><code>23001</code></p>
+</div><span id='variant.NotNullViolation' class='variant'><span id='NotNullViolation.v' class='invisible'><code>NotNullViolation</code></span></span><div class='docblock'><p><code>23502</code></p>
+</div><span id='variant.ForeignKeyViolation' class='variant'><span id='ForeignKeyViolation.v' class='invisible'><code>ForeignKeyViolation</code></span></span><div class='docblock'><p><code>23503</code></p>
+</div><span id='variant.UniqueViolation' class='variant'><span id='UniqueViolation.v' class='invisible'><code>UniqueViolation</code></span></span><div class='docblock'><p><code>23505</code></p>
+</div><span id='variant.CheckViolation' class='variant'><span id='CheckViolation.v' class='invisible'><code>CheckViolation</code></span></span><div class='docblock'><p><code>23514</code></p>
+</div><span id='variant.ExclusionViolation' class='variant'><span id='ExclusionViolation.v' class='invisible'><code>ExclusionViolation</code></span></span><div class='docblock'><p><code>23P01</code></p>
+</div><span id='variant.InvalidCursorState' class='variant'><span id='InvalidCursorState.v' class='invisible'><code>InvalidCursorState</code></span></span><div class='docblock'><p><code>24000</code></p>
+</div><span id='variant.InvalidTransactionState' class='variant'><span id='InvalidTransactionState.v' class='invisible'><code>InvalidTransactionState</code></span></span><div class='docblock'><p><code>25000</code></p>
+</div><span id='variant.ActiveSqlTransaction' class='variant'><span id='ActiveSqlTransaction.v' class='invisible'><code>ActiveSqlTransaction</code></span></span><div class='docblock'><p><code>25001</code></p>
+</div><span id='variant.BranchTransactionAlreadyActive' class='variant'><span id='BranchTransactionAlreadyActive.v' class='invisible'><code>BranchTransactionAlreadyActive</code></span></span><div class='docblock'><p><code>25002</code></p>
+</div><span id='variant.HeldCursorRequiresSameIsolationLevel' class='variant'><span id='HeldCursorRequiresSameIsolationLevel.v' class='invisible'><code>HeldCursorRequiresSameIsolationLevel</code></span></span><div class='docblock'><p><code>25008</code></p>
+</div><span id='variant.InappropriateAccessModeForBranchTransaction' class='variant'><span id='InappropriateAccessModeForBranchTransaction.v' class='invisible'><code>InappropriateAccessModeForBranchTransaction</code></span></span><div class='docblock'><p><code>25003</code></p>
+</div><span id='variant.InappropriateIsolationLevelForBranchTransaction' class='variant'><span id='InappropriateIsolationLevelForBranchTransaction.v' class='invisible'><code>InappropriateIsolationLevelForBranchTransaction</code></span></span><div class='docblock'><p><code>25004</code></p>
+</div><span id='variant.NoActiveSqlTransactionForBranchTransaction' class='variant'><span id='NoActiveSqlTransactionForBranchTransaction.v' class='invisible'><code>NoActiveSqlTransactionForBranchTransaction</code></span></span><div class='docblock'><p><code>25005</code></p>
+</div><span id='variant.ReadOnlySqlTransaction' class='variant'><span id='ReadOnlySqlTransaction.v' class='invisible'><code>ReadOnlySqlTransaction</code></span></span><div class='docblock'><p><code>25006</code></p>
+</div><span id='variant.SchemaAndDataStatementMixingNotSupported' class='variant'><span id='SchemaAndDataStatementMixingNotSupported.v' class='invisible'><code>SchemaAndDataStatementMixingNotSupported</code></span></span><div class='docblock'><p><code>25007</code></p>
+</div><span id='variant.NoActiveSqlTransaction' class='variant'><span id='NoActiveSqlTransaction.v' class='invisible'><code>NoActiveSqlTransaction</code></span></span><div class='docblock'><p><code>25P01</code></p>
+</div><span id='variant.InFailedSqlTransaction' class='variant'><span id='InFailedSqlTransaction.v' class='invisible'><code>InFailedSqlTransaction</code></span></span><div class='docblock'><p><code>25P02</code></p>
+</div><span id='variant.InvalidSqlStatementName' class='variant'><span id='InvalidSqlStatementName.v' class='invisible'><code>InvalidSqlStatementName</code></span></span><div class='docblock'><p><code>26000</code></p>
+</div><span id='variant.TriggeredDataChangeViolation' class='variant'><span id='TriggeredDataChangeViolation.v' class='invisible'><code>TriggeredDataChangeViolation</code></span></span><div class='docblock'><p><code>27000</code></p>
+</div><span id='variant.InvalidAuthorizationSpecification' class='variant'><span id='InvalidAuthorizationSpecification.v' class='invisible'><code>InvalidAuthorizationSpecification</code></span></span><div class='docblock'><p><code>28000</code></p>
+</div><span id='variant.InvalidPassword' class='variant'><span id='InvalidPassword.v' class='invisible'><code>InvalidPassword</code></span></span><div class='docblock'><p><code>28P01</code></p>
+</div><span id='variant.DependentPrivilegeDescriptorsStillExist' class='variant'><span id='DependentPrivilegeDescriptorsStillExist.v' class='invisible'><code>DependentPrivilegeDescriptorsStillExist</code></span></span><div class='docblock'><p><code>2B000</code></p>
+</div><span id='variant.DependentObjectsStillExist' class='variant'><span id='DependentObjectsStillExist.v' class='invisible'><code>DependentObjectsStillExist</code></span></span><div class='docblock'><p><code>2BP01</code></p>
+</div><span id='variant.InvalidTransactionTermination' class='variant'><span id='InvalidTransactionTermination.v' class='invisible'><code>InvalidTransactionTermination</code></span></span><div class='docblock'><p><code>2D000</code></p>
+</div><span id='variant.SqlRoutineException' class='variant'><span id='SqlRoutineException.v' class='invisible'><code>SqlRoutineException</code></span></span><div class='docblock'><p><code>2F000</code></p>
+</div><span id='variant.FunctionExecutedNoReturnStatement' class='variant'><span id='FunctionExecutedNoReturnStatement.v' class='invisible'><code>FunctionExecutedNoReturnStatement</code></span></span><div class='docblock'><p><code>2F005</code></p>
+</div><span id='variant.SqlRoutineModifyingSqlDataNotPermitted' class='variant'><span id='SqlRoutineModifyingSqlDataNotPermitted.v' class='invisible'><code>SqlRoutineModifyingSqlDataNotPermitted</code></span></span><div class='docblock'><p><code>2F002</code></p>
+</div><span id='variant.SqlRoutineProhibitedSqlStatementAttempted' class='variant'><span id='SqlRoutineProhibitedSqlStatementAttempted.v' class='invisible'><code>SqlRoutineProhibitedSqlStatementAttempted</code></span></span><div class='docblock'><p><code>2F003</code></p>
+</div><span id='variant.SqlRoutineReadingSqlDataNotPermitted' class='variant'><span id='SqlRoutineReadingSqlDataNotPermitted.v' class='invisible'><code>SqlRoutineReadingSqlDataNotPermitted</code></span></span><div class='docblock'><p><code>2F004</code></p>
+</div><span id='variant.InvalidCursorName' class='variant'><span id='InvalidCursorName.v' class='invisible'><code>InvalidCursorName</code></span></span><div class='docblock'><p><code>34000</code></p>
+</div><span id='variant.ExternalRoutineException' class='variant'><span id='ExternalRoutineException.v' class='invisible'><code>ExternalRoutineException</code></span></span><div class='docblock'><p><code>38000</code></p>
+</div><span id='variant.ContainingSqlNotPermitted' class='variant'><span id='ContainingSqlNotPermitted.v' class='invisible'><code>ContainingSqlNotPermitted</code></span></span><div class='docblock'><p><code>38001</code></p>
+</div><span id='variant.ForeignRoutineModifyingSqlDataNotPermitted' class='variant'><span id='ForeignRoutineModifyingSqlDataNotPermitted.v' class='invisible'><code>ForeignRoutineModifyingSqlDataNotPermitted</code></span></span><div class='docblock'><p><code>38002</code></p>
+</div><span id='variant.ForeignRoutineProhibitedSqlStatementAttempted' class='variant'><span id='ForeignRoutineProhibitedSqlStatementAttempted.v' class='invisible'><code>ForeignRoutineProhibitedSqlStatementAttempted</code></span></span><div class='docblock'><p><code>38003</code></p>
+</div><span id='variant.ForeignRoutineReadingSqlDataNotPermitted' class='variant'><span id='ForeignRoutineReadingSqlDataNotPermitted.v' class='invisible'><code>ForeignRoutineReadingSqlDataNotPermitted</code></span></span><div class='docblock'><p><code>38004</code></p>
+</div><span id='variant.ExternalRoutineInvocationException' class='variant'><span id='ExternalRoutineInvocationException.v' class='invisible'><code>ExternalRoutineInvocationException</code></span></span><div class='docblock'><p><code>39000</code></p>
+</div><span id='variant.InvalidSqlstateReturned' class='variant'><span id='InvalidSqlstateReturned.v' class='invisible'><code>InvalidSqlstateReturned</code></span></span><div class='docblock'><p><code>39001</code></p>
+</div><span id='variant.ExternalRoutineInvocationNullValueNotAllowed' class='variant'><span id='ExternalRoutineInvocationNullValueNotAllowed.v' class='invisible'><code>ExternalRoutineInvocationNullValueNotAllowed</code></span></span><div class='docblock'><p><code>39004</code></p>
+</div><span id='variant.TriggerProtocolViolated' class='variant'><span id='TriggerProtocolViolated.v' class='invisible'><code>TriggerProtocolViolated</code></span></span><div class='docblock'><p><code>39P01</code></p>
+</div><span id='variant.SrfProtocolViolated' class='variant'><span id='SrfProtocolViolated.v' class='invisible'><code>SrfProtocolViolated</code></span></span><div class='docblock'><p><code>39P02</code></p>
+</div><span id='variant.EventTriggerProtocolViolated' class='variant'><span id='EventTriggerProtocolViolated.v' class='invisible'><code>EventTriggerProtocolViolated</code></span></span><div class='docblock'><p><code>39P03</code></p>
+</div><span id='variant.SavepointException' class='variant'><span id='SavepointException.v' class='invisible'><code>SavepointException</code></span></span><div class='docblock'><p><code>3B000</code></p>
+</div><span id='variant.InvalidSavepointSpecification' class='variant'><span id='InvalidSavepointSpecification.v' class='invisible'><code>InvalidSavepointSpecification</code></span></span><div class='docblock'><p><code>3B001</code></p>
+</div><span id='variant.InvalidCatalogName' class='variant'><span id='InvalidCatalogName.v' class='invisible'><code>InvalidCatalogName</code></span></span><div class='docblock'><p><code>3D000</code></p>
+</div><span id='variant.InvalidSchemaName' class='variant'><span id='InvalidSchemaName.v' class='invisible'><code>InvalidSchemaName</code></span></span><div class='docblock'><p><code>3F000</code></p>
+</div><span id='variant.TransactionRollback' class='variant'><span id='TransactionRollback.v' class='invisible'><code>TransactionRollback</code></span></span><div class='docblock'><p><code>40000</code></p>
+</div><span id='variant.TransactionIntegrityConstraintViolation' class='variant'><span id='TransactionIntegrityConstraintViolation.v' class='invisible'><code>TransactionIntegrityConstraintViolation</code></span></span><div class='docblock'><p><code>40002</code></p>
+</div><span id='variant.SerializationFailure' class='variant'><span id='SerializationFailure.v' class='invisible'><code>SerializationFailure</code></span></span><div class='docblock'><p><code>40001</code></p>
+</div><span id='variant.StatementCompletionUnknown' class='variant'><span id='StatementCompletionUnknown.v' class='invisible'><code>StatementCompletionUnknown</code></span></span><div class='docblock'><p><code>40003</code></p>
+</div><span id='variant.DeadlockDetected' class='variant'><span id='DeadlockDetected.v' class='invisible'><code>DeadlockDetected</code></span></span><div class='docblock'><p><code>40P01</code></p>
+</div><span id='variant.SyntaxErrorOrAccessRuleViolation' class='variant'><span id='SyntaxErrorOrAccessRuleViolation.v' class='invisible'><code>SyntaxErrorOrAccessRuleViolation</code></span></span><div class='docblock'><p><code>42000</code></p>
+</div><span id='variant.SyntaxError' class='variant'><span id='SyntaxError.v' class='invisible'><code>SyntaxError</code></span></span><div class='docblock'><p><code>42601</code></p>
+</div><span id='variant.InsufficientPrivilege' class='variant'><span id='InsufficientPrivilege.v' class='invisible'><code>InsufficientPrivilege</code></span></span><div class='docblock'><p><code>42501</code></p>
+</div><span id='variant.CannotCoerce' class='variant'><span id='CannotCoerce.v' class='invisible'><code>CannotCoerce</code></span></span><div class='docblock'><p><code>42846</code></p>
+</div><span id='variant.GroupingError' class='variant'><span id='GroupingError.v' class='invisible'><code>GroupingError</code></span></span><div class='docblock'><p><code>42803</code></p>
+</div><span id='variant.WindowingError' class='variant'><span id='WindowingError.v' class='invisible'><code>WindowingError</code></span></span><div class='docblock'><p><code>42P20</code></p>
+</div><span id='variant.InvalidRecursion' class='variant'><span id='InvalidRecursion.v' class='invisible'><code>InvalidRecursion</code></span></span><div class='docblock'><p><code>42P19</code></p>
+</div><span id='variant.InvalidForeignKey' class='variant'><span id='InvalidForeignKey.v' class='invisible'><code>InvalidForeignKey</code></span></span><div class='docblock'><p><code>42830</code></p>
+</div><span id='variant.InvalidName' class='variant'><span id='InvalidName.v' class='invisible'><code>InvalidName</code></span></span><div class='docblock'><p><code>42602</code></p>
+</div><span id='variant.NameTooLong' class='variant'><span id='NameTooLong.v' class='invisible'><code>NameTooLong</code></span></span><div class='docblock'><p><code>42622</code></p>
+</div><span id='variant.ReservedName' class='variant'><span id='ReservedName.v' class='invisible'><code>ReservedName</code></span></span><div class='docblock'><p><code>42939</code></p>
+</div><span id='variant.DatatypeMismatch' class='variant'><span id='DatatypeMismatch.v' class='invisible'><code>DatatypeMismatch</code></span></span><div class='docblock'><p><code>42804</code></p>
+</div><span id='variant.IndeterminateDatatype' class='variant'><span id='IndeterminateDatatype.v' class='invisible'><code>IndeterminateDatatype</code></span></span><div class='docblock'><p><code>42P18</code></p>
+</div><span id='variant.CollationMismatch' class='variant'><span id='CollationMismatch.v' class='invisible'><code>CollationMismatch</code></span></span><div class='docblock'><p><code>42P21</code></p>
+</div><span id='variant.IndeterminateCollation' class='variant'><span id='IndeterminateCollation.v' class='invisible'><code>IndeterminateCollation</code></span></span><div class='docblock'><p><code>42P22</code></p>
+</div><span id='variant.WrongObjectType' class='variant'><span id='WrongObjectType.v' class='invisible'><code>WrongObjectType</code></span></span><div class='docblock'><p><code>42809</code></p>
+</div><span id='variant.UndefinedColumn' class='variant'><span id='UndefinedColumn.v' class='invisible'><code>UndefinedColumn</code></span></span><div class='docblock'><p><code>42703</code></p>
+</div><span id='variant.UndefinedFunction' class='variant'><span id='UndefinedFunction.v' class='invisible'><code>UndefinedFunction</code></span></span><div class='docblock'><p><code>42883</code></p>
+</div><span id='variant.UndefinedTable' class='variant'><span id='UndefinedTable.v' class='invisible'><code>UndefinedTable</code></span></span><div class='docblock'><p><code>42P01</code></p>
+</div><span id='variant.UndefinedParameter' class='variant'><span id='UndefinedParameter.v' class='invisible'><code>UndefinedParameter</code></span></span><div class='docblock'><p><code>42P02</code></p>
+</div><span id='variant.UndefinedObject' class='variant'><span id='UndefinedObject.v' class='invisible'><code>UndefinedObject</code></span></span><div class='docblock'><p><code>42704</code></p>
+</div><span id='variant.DuplicateColumn' class='variant'><span id='DuplicateColumn.v' class='invisible'><code>DuplicateColumn</code></span></span><div class='docblock'><p><code>42701</code></p>
+</div><span id='variant.DuplicateCursor' class='variant'><span id='DuplicateCursor.v' class='invisible'><code>DuplicateCursor</code></span></span><div class='docblock'><p><code>42P03</code></p>
+</div><span id='variant.DuplicateDatabase' class='variant'><span id='DuplicateDatabase.v' class='invisible'><code>DuplicateDatabase</code></span></span><div class='docblock'><p><code>42P04</code></p>
+</div><span id='variant.DuplicateFunction' class='variant'><span id='DuplicateFunction.v' class='invisible'><code>DuplicateFunction</code></span></span><div class='docblock'><p><code>42723</code></p>
+</div><span id='variant.DuplicatePreparedStatement' class='variant'><span id='DuplicatePreparedStatement.v' class='invisible'><code>DuplicatePreparedStatement</code></span></span><div class='docblock'><p><code>42P05</code></p>
+</div><span id='variant.DuplicateSchema' class='variant'><span id='DuplicateSchema.v' class='invisible'><code>DuplicateSchema</code></span></span><div class='docblock'><p><code>42P06</code></p>
+</div><span id='variant.DuplicateTable' class='variant'><span id='DuplicateTable.v' class='invisible'><code>DuplicateTable</code></span></span><div class='docblock'><p><code>42P07</code></p>
+</div><span id='variant.DuplicateAlias' class='variant'><span id='DuplicateAlias.v' class='invisible'><code>DuplicateAlias</code></span></span><div class='docblock'><p><code>42712</code></p>
+</div><span id='variant.DuplicateObject' class='variant'><span id='DuplicateObject.v' class='invisible'><code>DuplicateObject</code></span></span><div class='docblock'><p><code>42710</code></p>
+</div><span id='variant.AmbiguousColumn' class='variant'><span id='AmbiguousColumn.v' class='invisible'><code>AmbiguousColumn</code></span></span><div class='docblock'><p><code>42702</code></p>
+</div><span id='variant.AmbiguousFunction' class='variant'><span id='AmbiguousFunction.v' class='invisible'><code>AmbiguousFunction</code></span></span><div class='docblock'><p><code>42725</code></p>
+</div><span id='variant.AmbiguousParameter' class='variant'><span id='AmbiguousParameter.v' class='invisible'><code>AmbiguousParameter</code></span></span><div class='docblock'><p><code>42P08</code></p>
+</div><span id='variant.AmbiguousAlias' class='variant'><span id='AmbiguousAlias.v' class='invisible'><code>AmbiguousAlias</code></span></span><div class='docblock'><p><code>42P09</code></p>
+</div><span id='variant.InvalidColumnReference' class='variant'><span id='InvalidColumnReference.v' class='invisible'><code>InvalidColumnReference</code></span></span><div class='docblock'><p><code>42P10</code></p>
+</div><span id='variant.InvalidColumnDefinition' class='variant'><span id='InvalidColumnDefinition.v' class='invisible'><code>InvalidColumnDefinition</code></span></span><div class='docblock'><p><code>42611</code></p>
+</div><span id='variant.InvalidCursorDefinition' class='variant'><span id='InvalidCursorDefinition.v' class='invisible'><code>InvalidCursorDefinition</code></span></span><div class='docblock'><p><code>42P11</code></p>
+</div><span id='variant.InvalidDatabaseDefinition' class='variant'><span id='InvalidDatabaseDefinition.v' class='invisible'><code>InvalidDatabaseDefinition</code></span></span><div class='docblock'><p><code>42P12</code></p>
+</div><span id='variant.InvalidFunctionDefinition' class='variant'><span id='InvalidFunctionDefinition.v' class='invisible'><code>InvalidFunctionDefinition</code></span></span><div class='docblock'><p><code>42P13</code></p>
+</div><span id='variant.InvalidPreparedStatementDefinition' class='variant'><span id='InvalidPreparedStatementDefinition.v' class='invisible'><code>InvalidPreparedStatementDefinition</code></span></span><div class='docblock'><p><code>42P14</code></p>
+</div><span id='variant.InvalidSchemaDefinition' class='variant'><span id='InvalidSchemaDefinition.v' class='invisible'><code>InvalidSchemaDefinition</code></span></span><div class='docblock'><p><code>42P15</code></p>
+</div><span id='variant.InvalidTableDefinition' class='variant'><span id='InvalidTableDefinition.v' class='invisible'><code>InvalidTableDefinition</code></span></span><div class='docblock'><p><code>42P16</code></p>
+</div><span id='variant.InvalidObjectDefinition' class='variant'><span id='InvalidObjectDefinition.v' class='invisible'><code>InvalidObjectDefinition</code></span></span><div class='docblock'><p><code>42P17</code></p>
+</div><span id='variant.WithCheckOptionViolation' class='variant'><span id='WithCheckOptionViolation.v' class='invisible'><code>WithCheckOptionViolation</code></span></span><div class='docblock'><p><code>44000</code></p>
+</div><span id='variant.InsufficientResources' class='variant'><span id='InsufficientResources.v' class='invisible'><code>InsufficientResources</code></span></span><div class='docblock'><p><code>53000</code></p>
+</div><span id='variant.DiskFull' class='variant'><span id='DiskFull.v' class='invisible'><code>DiskFull</code></span></span><div class='docblock'><p><code>53100</code></p>
+</div><span id='variant.OutOfMemory' class='variant'><span id='OutOfMemory.v' class='invisible'><code>OutOfMemory</code></span></span><div class='docblock'><p><code>53200</code></p>
+</div><span id='variant.TooManyConnections' class='variant'><span id='TooManyConnections.v' class='invisible'><code>TooManyConnections</code></span></span><div class='docblock'><p><code>53300</code></p>
+</div><span id='variant.ConfigurationLimitExceeded' class='variant'><span id='ConfigurationLimitExceeded.v' class='invisible'><code>ConfigurationLimitExceeded</code></span></span><div class='docblock'><p><code>53400</code></p>
+</div><span id='variant.ProgramLimitExceeded' class='variant'><span id='ProgramLimitExceeded.v' class='invisible'><code>ProgramLimitExceeded</code></span></span><div class='docblock'><p><code>54000</code></p>
+</div><span id='variant.StatementTooComplex' class='variant'><span id='StatementTooComplex.v' class='invisible'><code>StatementTooComplex</code></span></span><div class='docblock'><p><code>54001</code></p>
+</div><span id='variant.TooManyColumns' class='variant'><span id='TooManyColumns.v' class='invisible'><code>TooManyColumns</code></span></span><div class='docblock'><p><code>54011</code></p>
+</div><span id='variant.TooManyArguments' class='variant'><span id='TooManyArguments.v' class='invisible'><code>TooManyArguments</code></span></span><div class='docblock'><p><code>54023</code></p>
+</div><span id='variant.ObjectNotInPrerequisiteState' class='variant'><span id='ObjectNotInPrerequisiteState.v' class='invisible'><code>ObjectNotInPrerequisiteState</code></span></span><div class='docblock'><p><code>55000</code></p>
+</div><span id='variant.ObjectInUse' class='variant'><span id='ObjectInUse.v' class='invisible'><code>ObjectInUse</code></span></span><div class='docblock'><p><code>55006</code></p>
+</div><span id='variant.CantChangeRuntimeParam' class='variant'><span id='CantChangeRuntimeParam.v' class='invisible'><code>CantChangeRuntimeParam</code></span></span><div class='docblock'><p><code>55P02</code></p>
+</div><span id='variant.LockNotAvailable' class='variant'><span id='LockNotAvailable.v' class='invisible'><code>LockNotAvailable</code></span></span><div class='docblock'><p><code>55P03</code></p>
+</div><span id='variant.OperatorIntervention' class='variant'><span id='OperatorIntervention.v' class='invisible'><code>OperatorIntervention</code></span></span><div class='docblock'><p><code>57000</code></p>
+</div><span id='variant.QueryCanceled' class='variant'><span id='QueryCanceled.v' class='invisible'><code>QueryCanceled</code></span></span><div class='docblock'><p><code>57014</code></p>
+</div><span id='variant.AdminShutdown' class='variant'><span id='AdminShutdown.v' class='invisible'><code>AdminShutdown</code></span></span><div class='docblock'><p><code>57P01</code></p>
+</div><span id='variant.CrashShutdown' class='variant'><span id='CrashShutdown.v' class='invisible'><code>CrashShutdown</code></span></span><div class='docblock'><p><code>57P02</code></p>
+</div><span id='variant.CannotConnectNow' class='variant'><span id='CannotConnectNow.v' class='invisible'><code>CannotConnectNow</code></span></span><div class='docblock'><p><code>57P03</code></p>
+</div><span id='variant.DatabaseDropped' class='variant'><span id='DatabaseDropped.v' class='invisible'><code>DatabaseDropped</code></span></span><div class='docblock'><p><code>57P04</code></p>
+</div><span id='variant.SystemError' class='variant'><span id='SystemError.v' class='invisible'><code>SystemError</code></span></span><div class='docblock'><p><code>58000</code></p>
+</div><span id='variant.IoError' class='variant'><span id='IoError.v' class='invisible'><code>IoError</code></span></span><div class='docblock'><p><code>58030</code></p>
+</div><span id='variant.UndefinedFile' class='variant'><span id='UndefinedFile.v' class='invisible'><code>UndefinedFile</code></span></span><div class='docblock'><p><code>58P01</code></p>
+</div><span id='variant.DuplicateFile' class='variant'><span id='DuplicateFile.v' class='invisible'><code>DuplicateFile</code></span></span><div class='docblock'><p><code>58P02</code></p>
+</div><span id='variant.ConfigFileError' class='variant'><span id='ConfigFileError.v' class='invisible'><code>ConfigFileError</code></span></span><div class='docblock'><p><code>F0000</code></p>
+</div><span id='variant.LockFileExists' class='variant'><span id='LockFileExists.v' class='invisible'><code>LockFileExists</code></span></span><div class='docblock'><p><code>F0001</code></p>
+</div><span id='variant.FdwError' class='variant'><span id='FdwError.v' class='invisible'><code>FdwError</code></span></span><div class='docblock'><p><code>HV000</code></p>
+</div><span id='variant.FdwColumnNameNotFound' class='variant'><span id='FdwColumnNameNotFound.v' class='invisible'><code>FdwColumnNameNotFound</code></span></span><div class='docblock'><p><code>HV005</code></p>
+</div><span id='variant.FdwDynamicParameterValueNeeded' class='variant'><span id='FdwDynamicParameterValueNeeded.v' class='invisible'><code>FdwDynamicParameterValueNeeded</code></span></span><div class='docblock'><p><code>HV002</code></p>
+</div><span id='variant.FdwFunctionSequenceError' class='variant'><span id='FdwFunctionSequenceError.v' class='invisible'><code>FdwFunctionSequenceError</code></span></span><div class='docblock'><p><code>HV010</code></p>
+</div><span id='variant.FdwInconsistentDescriptorInformation' class='variant'><span id='FdwInconsistentDescriptorInformation.v' class='invisible'><code>FdwInconsistentDescriptorInformation</code></span></span><div class='docblock'><p><code>HV021</code></p>
+</div><span id='variant.FdwInvalidAttributeValue' class='variant'><span id='FdwInvalidAttributeValue.v' class='invisible'><code>FdwInvalidAttributeValue</code></span></span><div class='docblock'><p><code>HV024</code></p>
+</div><span id='variant.FdwInvalidColumnName' class='variant'><span id='FdwInvalidColumnName.v' class='invisible'><code>FdwInvalidColumnName</code></span></span><div class='docblock'><p><code>HV007</code></p>
+</div><span id='variant.FdwInvalidColumnNumber' class='variant'><span id='FdwInvalidColumnNumber.v' class='invisible'><code>FdwInvalidColumnNumber</code></span></span><div class='docblock'><p><code>HV008</code></p>
+</div><span id='variant.FdwInvalidDataType' class='variant'><span id='FdwInvalidDataType.v' class='invisible'><code>FdwInvalidDataType</code></span></span><div class='docblock'><p><code>HV004</code></p>
+</div><span id='variant.FdwInvalidDataTypeDescriptors' class='variant'><span id='FdwInvalidDataTypeDescriptors.v' class='invisible'><code>FdwInvalidDataTypeDescriptors</code></span></span><div class='docblock'><p><code>HV006</code></p>
+</div><span id='variant.FdwInvalidDescriptorFieldIdentifier' class='variant'><span id='FdwInvalidDescriptorFieldIdentifier.v' class='invisible'><code>FdwInvalidDescriptorFieldIdentifier</code></span></span><div class='docblock'><p><code>HV091</code></p>
+</div><span id='variant.FdwInvalidHandle' class='variant'><span id='FdwInvalidHandle.v' class='invisible'><code>FdwInvalidHandle</code></span></span><div class='docblock'><p><code>HV00B</code></p>
+</div><span id='variant.FdwInvalidOptionIndex' class='variant'><span id='FdwInvalidOptionIndex.v' class='invisible'><code>FdwInvalidOptionIndex</code></span></span><div class='docblock'><p><code>HV00C</code></p>
+</div><span id='variant.FdwInvalidOptionName' class='variant'><span id='FdwInvalidOptionName.v' class='invisible'><code>FdwInvalidOptionName</code></span></span><div class='docblock'><p><code>HV00D</code></p>
+</div><span id='variant.FdwInvalidStringLengthOrBufferLength' class='variant'><span id='FdwInvalidStringLengthOrBufferLength.v' class='invisible'><code>FdwInvalidStringLengthOrBufferLength</code></span></span><div class='docblock'><p><code>HV090</code></p>
+</div><span id='variant.FdwInvalidStringFormat' class='variant'><span id='FdwInvalidStringFormat.v' class='invisible'><code>FdwInvalidStringFormat</code></span></span><div class='docblock'><p><code>HV00A</code></p>
+</div><span id='variant.FdwInvalidUseOfNullPointer' class='variant'><span id='FdwInvalidUseOfNullPointer.v' class='invisible'><code>FdwInvalidUseOfNullPointer</code></span></span><div class='docblock'><p><code>HV009</code></p>
+</div><span id='variant.FdwTooManyHandles' class='variant'><span id='FdwTooManyHandles.v' class='invisible'><code>FdwTooManyHandles</code></span></span><div class='docblock'><p><code>HV014</code></p>
+</div><span id='variant.FdwOutOfMemory' class='variant'><span id='FdwOutOfMemory.v' class='invisible'><code>FdwOutOfMemory</code></span></span><div class='docblock'><p><code>HV001</code></p>
+</div><span id='variant.FdwNoSchemas' class='variant'><span id='FdwNoSchemas.v' class='invisible'><code>FdwNoSchemas</code></span></span><div class='docblock'><p><code>HV00P</code></p>
+</div><span id='variant.FdwOptionNameNotFound' class='variant'><span id='FdwOptionNameNotFound.v' class='invisible'><code>FdwOptionNameNotFound</code></span></span><div class='docblock'><p><code>HV00J</code></p>
+</div><span id='variant.FdwReplyHandle' class='variant'><span id='FdwReplyHandle.v' class='invisible'><code>FdwReplyHandle</code></span></span><div class='docblock'><p><code>HV00K</code></p>
+</div><span id='variant.FdwSchemaNotFound' class='variant'><span id='FdwSchemaNotFound.v' class='invisible'><code>FdwSchemaNotFound</code></span></span><div class='docblock'><p><code>HV00Q</code></p>
+</div><span id='variant.FdwTableNotFound' class='variant'><span id='FdwTableNotFound.v' class='invisible'><code>FdwTableNotFound</code></span></span><div class='docblock'><p><code>HV00R</code></p>
+</div><span id='variant.FdwUnableToCreateExecution' class='variant'><span id='FdwUnableToCreateExecution.v' class='invisible'><code>FdwUnableToCreateExecution</code></span></span><div class='docblock'><p><code>HV00L</code></p>
+</div><span id='variant.FdwUnableToCreateReply' class='variant'><span id='FdwUnableToCreateReply.v' class='invisible'><code>FdwUnableToCreateReply</code></span></span><div class='docblock'><p><code>HV00M</code></p>
+</div><span id='variant.FdwUnableToEstablishConnection' class='variant'><span id='FdwUnableToEstablishConnection.v' class='invisible'><code>FdwUnableToEstablishConnection</code></span></span><div class='docblock'><p><code>HV00N</code></p>
+</div><span id='variant.PlpgsqlError' class='variant'><span id='PlpgsqlError.v' class='invisible'><code>PlpgsqlError</code></span></span><div class='docblock'><p><code>P0000</code></p>
+</div><span id='variant.RaiseException' class='variant'><span id='RaiseException.v' class='invisible'><code>RaiseException</code></span></span><div class='docblock'><p><code>P0001</code></p>
+</div><span id='variant.NoDataFound' class='variant'><span id='NoDataFound.v' class='invisible'><code>NoDataFound</code></span></span><div class='docblock'><p><code>P0002</code></p>
+</div><span id='variant.TooManyRows' class='variant'><span id='TooManyRows.v' class='invisible'><code>TooManyRows</code></span></span><div class='docblock'><p><code>P0003</code></p>
+</div><span id='variant.AssertFailure' class='variant'><span id='AssertFailure.v' class='invisible'><code>AssertFailure</code></span></span><div class='docblock'><p><code>P0004</code></p>
+</div><span id='variant.InternalError' class='variant'><span id='InternalError.v' class='invisible'><code>InternalError</code></span></span><div class='docblock'><p><code>XX000</code></p>
+</div><span id='variant.DataCorrupted' class='variant'><span id='DataCorrupted.v' class='invisible'><code>DataCorrupted</code></span></span><div class='docblock'><p><code>XX001</code></p>
+</div><span id='variant.IndexCorrupted' class='variant'><span id='IndexCorrupted.v' class='invisible'><code>IndexCorrupted</code></span></span><div class='docblock'><p><code>XX002</code></p>
+</div><span id='variant.Other' class='variant'><span id='Other.v' class='invisible'><code>Other(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>)</code></span></span><div class='docblock'><p>An unknown code</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/error/sqlstate.rs.html#776-1027' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_code' class='method'><span id='from_code.v' class='invisible'><code>fn <a href='#method.from_code' class='fnname'>from_code</a>(s: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a></code></span></h4>
+<div class='docblock'><p>Creates a <code>SqlState</code> from its error code.</p>
+</div><h4 id='method.code' class='method'><span id='code.v' class='invisible'><code>fn <a href='#method.code' class='fnname'>code</a>(&amp;self) -&gt; &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></span></h4>
+<div class='docblock'><p>Returns the error code corresponding to the <code>SqlState</code>.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/error/sqlstate.rs.html#5' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class='method'><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class='method'><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/error/sqlstate.rs.html#5' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/error/sqlstate.rs.html#5' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../postgres/error/enum.SqlState.html' title='postgres::error::SqlState'>SqlState</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/error/sqlstate.rs.html#5' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "postgres";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

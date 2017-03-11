@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Stream","A connection to the Postgres server."]],"trait":[["NegotiateSsl","A trait implemented by types that can negotiate SSL over a Postgres stream."],["StreamWrapper","A trait implemented by SSL adaptors."]]});

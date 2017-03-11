@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["StringMessage","Message containing a utf8 String"]]});

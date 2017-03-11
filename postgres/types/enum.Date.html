@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Date` enum in crate `postgres`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Date">
+
+    <title>postgres::types::Date - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>postgres</a>::<wbr><a href='index.html'>types</a></p><script>window.sidebarCurrent = {name: 'Date', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>postgres</a>::<wbr><a href='index.html'>types</a>::<wbr><a class='enum' href=''>Date</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/postgres/types/special.rs.html#12-19' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum Date&lt;T&gt; {
+    PosInfinity,
+    NegInfinity,
+    Value(T),
+}</pre><div class='docblock'><p>A wrapper that can be used to represent infinity with <code>Type::Date</code> types.</p>
+</div><h2 class='variants'>Variants</h2>
+<span id='variant.PosInfinity' class='variant'><span id='PosInfinity.v' class='invisible'><code>PosInfinity</code></span></span><div class='docblock'><p>Represents <code>infinity</code>, a date that is later than all other dates.</p>
+</div><span id='variant.NegInfinity' class='variant'><span id='NegInfinity.v' class='invisible'><code>NegInfinity</code></span></span><div class='docblock'><p>Represents <code>-infinity</code>, a date that is earlier than all other dates.</p>
+</div><span id='variant.Value' class='variant'><span id='Value.v' class='invisible'><code>Value(T)</code></span></span><div class='docblock'><p>The wrapped date.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl&lt;T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/types/special.rs.html#11' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/types/special.rs.html#11' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;</code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/types/special.rs.html#11' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl&lt;T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/types/special.rs.html#11' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class='method'><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class='method'><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;T:&nbsp;<a class='trait' href='../../postgres/types/trait.FromSql.html' title='postgres::types::FromSql'>FromSql</a>&gt; <a class='trait' href='../../postgres/types/trait.FromSql.html' title='postgres::types::FromSql'>FromSql</a> for <a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/types/special.rs.html#21-40' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_sql' class='method'><span id='from_sql.v' class='invisible'><code>fn <a href='../../postgres/types/trait.FromSql.html#tymethod.from_sql' class='fnname'>from_sql</a>&lt;R:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a>&gt;(ty: &amp;<a class='enum' href='../../postgres/types/enum.Type.html' title='postgres::types::Type'>Type</a>, raw: &amp;mut R, ctx: &amp;<a class='struct' href='../../postgres/types/struct.SessionInfo.html' title='postgres::types::SessionInfo'>SessionInfo</a>) -&gt; <a class='type' href='../../postgres/type.Result.html' title='postgres::Result'>Result</a>&lt;Self&gt;</code></span></h4>
+<div class='docblock'><p>Creates a new value of this type from a <code>Read</code>er of the binary format of the specified Postgres <code>Type</code>. <a href="../../postgres/types/trait.FromSql.html#tymethod.from_sql">Read more</a></p>
+</div><h4 id='method.accepts' class='method'><span id='accepts.v' class='invisible'><code>fn <a href='../../postgres/types/trait.FromSql.html#tymethod.accepts' class='fnname'>accepts</a>(ty: &amp;<a class='enum' href='../../postgres/types/enum.Type.html' title='postgres::types::Type'>Type</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+<div class='docblock'><p>Determines if a value of this type can be created from the specified Postgres <code>Type</code>. <a href="../../postgres/types/trait.FromSql.html#tymethod.accepts">Read more</a></p>
+</div><h4 id='method.from_sql_null' class='method'><span id='from_sql_null.v' class='invisible'><code>fn <a href='../../postgres/types/trait.FromSql.html#method.from_sql_null' class='fnname'>from_sql_null</a>(ty: &amp;<a class='enum' href='../../postgres/types/enum.Type.html' title='postgres::types::Type'>Type</a>, ctx: &amp;<a class='struct' href='../../postgres/types/struct.SessionInfo.html' title='postgres::types::SessionInfo'>SessionInfo</a>) -&gt; <a class='type' href='../../postgres/type.Result.html' title='postgres::Result'>Result</a>&lt;Self&gt;</code></span></h4>
+<div class='docblock'><p>Creates a new value of this type from a <code>NULL</code> SQL value. <a href="../../postgres/types/trait.FromSql.html#method.from_sql_null">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl&lt;T:&nbsp;<a class='trait' href='../../postgres/types/trait.ToSql.html' title='postgres::types::ToSql'>ToSql</a>&gt; <a class='trait' href='../../postgres/types/trait.ToSql.html' title='postgres::types::ToSql'>ToSql</a> for <a class='enum' href='../../postgres/types/enum.Date.html' title='postgres::types::Date'>Date</a>&lt;T&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/postgres/types/special.rs.html#41-62' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.to_sql' class='method'><span id='to_sql.v' class='invisible'><code>fn <a href='../../postgres/types/trait.ToSql.html#tymethod.to_sql' class='fnname'>to_sql</a>&lt;W:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a> + ?<a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a>&gt;(&amp;self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ty: &amp;<a class='enum' href='../../postgres/types/enum.Type.html' title='postgres::types::Type'>Type</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out: &amp;mut W,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ctx: &amp;<a class='struct' href='../../postgres/types/struct.SessionInfo.html' title='postgres::types::SessionInfo'>SessionInfo</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='../../postgres/type.Result.html' title='postgres::Result'>Result</a>&lt;<a class='enum' href='../../postgres/types/enum.IsNull.html' title='postgres::types::IsNull'>IsNull</a>&gt;</code></span></h4>
+<div class='docblock'><p>Converts the value of <code>self</code> into the binary format of the specified Postgres <code>Type</code>, writing it to <code>out</code>. <a href="../../postgres/types/trait.ToSql.html#tymethod.to_sql">Read more</a></p>
+</div><h4 id='method.accepts-1' class='method'><span id='accepts.v-1' class='invisible'><code>fn <a href='../../postgres/types/trait.ToSql.html#tymethod.accepts' class='fnname'>accepts</a>(ty: &amp;<a class='enum' href='../../postgres/types/enum.Type.html' title='postgres::types::Type'>Type</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+<div class='docblock'><p>Determines if a value of this type can be converted to the specified Postgres <code>Type</code>. <a href="../../postgres/types/trait.ToSql.html#tymethod.accepts">Read more</a></p>
+</div><h4 id='method.to_sql_checked' class='method'><span id='to_sql_checked.v' class='invisible'><code>fn <a href='../../postgres/types/trait.ToSql.html#tymethod.to_sql_checked' class='fnname'>to_sql_checked</a>(&amp;self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ty: &amp;<a class='enum' href='../../postgres/types/enum.Type.html' title='postgres::types::Type'>Type</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out: &amp;mut <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ctx: &amp;<a class='struct' href='../../postgres/types/struct.SessionInfo.html' title='postgres::types::SessionInfo'>SessionInfo</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='../../postgres/type.Result.html' title='postgres::Result'>Result</a>&lt;<a class='enum' href='../../postgres/types/enum.IsNull.html' title='postgres::types::IsNull'>IsNull</a>&gt;</code></span></h4>
+<div class='docblock'><p>An adaptor method used internally by Rust-Postgres. <a href="../../postgres/types/trait.ToSql.html#tymethod.to_sql_checked">Read more</a></p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "postgres";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Type","A Postgres type."]]});
